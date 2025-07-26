@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using AquaFarmApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AquaFarmApp.Controllers
@@ -18,6 +19,7 @@ namespace AquaFarmApp.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Privacy()
         {
             return View();
