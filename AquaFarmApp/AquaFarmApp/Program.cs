@@ -1,29 +1,48 @@
+﻿using AquaFarmApp.Data;
+using AquaFarmApp.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
+// Thêm DbContext
+builder.Services.AddDbContext<AquaFarmContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Cấu hình Identity
+builder.Services.AddIdentity<User, IdentityRole<int>>( options =>
+{
+    options.Password.RequireNonAlphanumeric = false; // Không yêu cầu ký tự đặc biệt trong mật khẩu
+    options.Password.RequiredLength = 8; // Đặt độ dài tối thiểu của mật khẩu
+    options.Password.RequireUppercase = false; // Yêu cầu ít nhất một chữ hoa
+    options.Password.RequireLowercase = false; // Yêu cầu ít nhất một chữ thường
+    options.User.RequireUniqueEmail = true; // Yêu cầu email duy nhất
+    options.SignIn.RequireConfirmedAccount = false; // Không yêu cầu xác nhận tài khoản
+    options.SignIn.RequireConfirmedEmail = false; // Không yêu cầu xác nhận email
+    options.SignIn.RequireConfirmedPhoneNumber = false; // Không yêu cầu xác nhận số điện thoại
+})
+    .AddEntityFrameworkStores<AquaFarmContext>()
+    .AddDefaultTokenProviders();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if(!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); 
+
 app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapStaticAssets();
-
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
-
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

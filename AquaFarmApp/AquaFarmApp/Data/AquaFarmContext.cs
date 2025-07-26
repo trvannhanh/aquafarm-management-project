@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using AquaFarmApp.Models;
+﻿using AquaFarmApp.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
 namespace AquaFarmApp.Data;
 
-public partial class AquaFarmContext : DbContext
+public partial class AquaFarmContext : IdentityDbContext<User, IdentityRole<int>, int>
 {
     public AquaFarmContext()
     {
@@ -37,11 +39,17 @@ public partial class AquaFarmContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=TRANVANNHANH\\SQLEXPRESS; Initial Catalog=AquaFarm;Integrated Security=True;Pooling=False;Encrypt=False;Trust Server Certificate=True");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Data Source=TRANVANNHANH\\SQLEXPRESS;Initial Catalog=AquaFarm;Integrated Security=True;Pooling=False;Encrypt=False;TrustServerCertificate=True");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Area>(entity =>
         {
             entity.HasKey(e => e.AreaId).HasName("PK__Area__985D6D6BEC7658ED");
@@ -113,13 +121,41 @@ public partial class AquaFarmContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.LiveStockTrans).HasConstraintName("FK__LiveStock__user___6EF57B66");
         });
 
+        // Ánh xạ bảng User cho ASP.NET Identity
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__User__B9BE370F71487F35");
+            entity.ToTable("User");
+            entity.HasKey(e => e.Id).HasName("PK__User__B9BE370F71487F35");
 
+            // Ánh xạ các thuộc tính Identity
+            entity.Property(e => e.Id).HasColumnName("user_id");
+            entity.Property(e => e.UserName).HasColumnName("username").HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.NormalizedUserName).HasColumnName("normalized_user_name").HasMaxLength(256).IsUnicode(false);
+            entity.Property(e => e.Email).HasColumnName("email").HasMaxLength(100).IsUnicode(false);
+            entity.Property(e => e.NormalizedEmail).HasColumnName("normalized_email").HasMaxLength(256).IsUnicode(false);
+            entity.Property(e => e.EmailConfirmed).HasColumnName("email_confirmed");
+            entity.Property(e => e.PasswordHash).HasColumnName("password").HasMaxLength(255).IsUnicode(false);
+            entity.Property(e => e.SecurityStamp).HasColumnName("security_stamp");
+            entity.Property(e => e.ConcurrencyStamp).HasColumnName("concurrency_stamp");
+            entity.Property(e => e.PhoneNumber).HasColumnName("phone_number").HasMaxLength(50).IsUnicode(false);
+            entity.Property(e => e.PhoneNumberConfirmed).HasColumnName("phone_number_confirmed");
+            entity.Property(e => e.TwoFactorEnabled).HasColumnName("two_factor_enabled");
+            entity.Property(e => e.LockoutEnd).HasColumnName("lockout_end");
+            entity.Property(e => e.LockoutEnabled).HasColumnName("lockout_enabled");
+            entity.Property(e => e.AccessFailedCount).HasColumnName("access_failed_count");
+
+            // Ánh xạ các thuộc tính tùy chỉnh
+            entity.Property(e => e.Fullname).HasColumnName("fullname").HasMaxLength(50);
+            entity.Property(e => e.Role).HasColumnName("role").HasMaxLength(10).IsUnicode(false);
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("datetime");
+
+            entity.HasIndex(e => e.UserName, "UQ__User__F3DBC572A7B6B1EE").IsUnique();
+
+            // Cấu hình mối quan hệ nhiều-nhiều với Farm
             entity.HasMany(d => d.Farms).WithMany(p => p.Users)
                 .UsingEntity<Dictionary<string, object>>(
-                    "FarmUser",
+                    "Farm_User",
                     r => r.HasOne<Farm>().WithMany()
                         .HasForeignKey("FarmId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
@@ -136,6 +172,13 @@ public partial class AquaFarmContext : DbContext
                         j.IndexerProperty<int>("FarmId").HasColumnName("farm_id");
                     });
         });
+
+        // Ánh xạ các bảng Identity
+        modelBuilder.Entity<IdentityRole<int>>().ToTable("Roles");
+        modelBuilder.Entity<IdentityUserRole<int>>().ToTable("UserRoles");
+        modelBuilder.Entity<IdentityUserClaim<int>>().ToTable("UserClaims");
+        modelBuilder.Entity<IdentityUserToken<int>>().ToTable("UserTokens");
+        modelBuilder.Entity<IdentityRoleClaim<int>>().ToTable("RoleClaims");
 
         OnModelCreatingPartial(modelBuilder);
     }
