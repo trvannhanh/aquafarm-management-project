@@ -1,0 +1,17 @@
+﻿@model AquaFarmApp.Models.Farm
+<h2>Tạo Farm</h2>
+<form asp-action="Create" method="post">
+    <div>
+        <label>Farm Name:</label>
+        <input asp-for="FarmName" />
+    </div>
+    <div>
+        <label>Location:</label>
+        <input asp-for="FarmLocation" />
+    </div>
+    <div>
+        <label>Số lượng khu vực:</label>
+        <input asp-for="AreaTotal" type="number" />
+    </div>
+    <button type="submit">Tạo</button>
+</form>

@@ -1,0 +1,10 @@
+﻿@model List<AquaFarmApp.Models.Farm>
+<h2>Danh sách Farm</h2>
+<ul>
+    @foreach (var farm in Model)
+    {
+        <li>
+            <a href="/Farm/Details/@farm.FarmId">@farm.FarmName</a>
+        </li>
+    }
+</ul>

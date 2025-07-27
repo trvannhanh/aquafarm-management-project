@@ -1,0 +1,12 @@
+﻿@model AquaFarmApp.Models.Farm
+<h2>Chi tiết Farm - @Model.FarmName</h2>
+<p>Địa điểm: @Model.FarmLocation</p>
+<p>Số khu: @Model.AreaTotal</p>
+
+<h3>Danh sách khu vực:</h3>
+<ul>
+    @foreach (var area in Model.Areas)
+    {
+        <li>@area.AreaName - @area.AreaStatus - @area.TypeOfWater</li>
+    }
+</ul>
