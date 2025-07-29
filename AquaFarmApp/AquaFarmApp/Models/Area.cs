@@ -18,7 +18,7 @@ public partial class Area
     public string AreaName { get; set; } = null!;
 
     [Column("area_status")]
-    [StringLength(10)]
+    [StringLength(20)]
     [Unicode(false)]
     public string AreaStatus { get; set; } = "Avail"!;
 

@@ -8,8 +8,8 @@
     @foreach (var area in Model.Areas)
     {
         <li>@area.AreaName - @area.AreaStatus - @area.TypeOfWater</li>
-        <a asp-controller="Area" asp-action="Edit" asp-route-id="@area.FarmId">Update</a>
-        <a asp-controller="Area" asp-action="Delete" asp-route-id="@area.FarmId" onclick="Are you sure ?"> Delete</a>
+        <a asp-controller="Area" asp-action="Edit" asp-route-id="@area.AreaId">Update</a>
+        <a asp-controller="Area" asp-action="Delete" asp-route-id="@area.AreaId" onclick="Are you sure ?"> Delete</a>
 
     }
     <a href="@Url.Action("Index", "Farm")" class="btn btn-secondary">Back</a>
