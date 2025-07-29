@@ -4,7 +4,7 @@
     @foreach (var farm in Model)
     {
         <li>
-            <a href="/Farm/Details/@farm.FarmId">@farm.FarmName</a>
+            <a asp-controller="Farm" asp-action="Details" asp-route-id="@farm.FarmId" >@farm.FarmName</a>
         </li>
     }
 </ul>

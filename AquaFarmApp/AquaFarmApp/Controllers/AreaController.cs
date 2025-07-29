@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using AquaFarmApp.Data;
 using AquaFarmApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AquaFarmApp.Controllers
 {
@@ -21,13 +22,13 @@ namespace AquaFarmApp.Controllers
             ViewBag.AreaTotal = areaTotal;
             ViewBag.FarmId = farmId;
             ViewBag.AreaStatusList = new List<string> { "Avail", "Not Avail", "Health Secured" };
-            ViewBag.TypeOfWaterList = new List<string> { "Nước ngọt", "Nước lợ", "Nước mặn", "Nước tuần hoàn", "Nước đã qua xử lý" };
+            ViewBag.TypeOfWaterList = new List<string> { "Freshwater", "Brackish water", "Saltwater", "Recirculated water", "Treated water" };
 
             return View();
         }
 
         [HttpPost]
-        public IActionResult CreateAreas(List<Area> areas)
+        public async Task<IActionResult> CreateAreas(List<Area> areas)
         {
             if (ModelState.IsValid)
             {
@@ -37,7 +38,7 @@ namespace AquaFarmApp.Controllers
                         area.AreaStatus = "Avail";
                     _context.Areas.Add(area);
                 }
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Menu", "Farm");
             }
             return View(areas);
@@ -46,17 +47,14 @@ namespace AquaFarmApp.Controllers
         public IActionResult Find()
         {
             ViewBag.AreaStatusList = new List<string> { "Avail", "Not Avail", "Health Secured" };
-            ViewBag.TypeOfWaterList = new List<string> { "Nước ngọt", "Nước lợ", "Nước mặn", "Nước tuần hoàn", "Nước đã qua xử lý" };
+            ViewBag.TypeOfWaterList = new List<string> { "Freshwater", "Brackish water", "Saltwater", "Recirculated water", "Treated water" };
             return View();
         }
 
         [HttpPost]
-        public IActionResult Find(string areaStatus, string typeOfWater)
+        public async Task<IActionResult> Find(string areaStatus, string typeOfWater)
         {
-            var areas = _context.Areas
-                .Where(a => (string.IsNullOrEmpty(areaStatus) || a.AreaStatus == areaStatus)
-                         && (string.IsNullOrEmpty(typeOfWater) || a.TypeOfWater == typeOfWater))
-                .ToList();
+            var areas = await _context.Areas.Where(a => (string.IsNullOrEmpty(areaStatus) || a.AreaStatus == areaStatus) && (string.IsNullOrEmpty(typeOfWater) || a.TypeOfWater == typeOfWater)).ToListAsync();
             return View("FindResult", areas);
         }
     }

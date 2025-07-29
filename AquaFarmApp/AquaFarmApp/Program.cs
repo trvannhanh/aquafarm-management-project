@@ -42,18 +42,4 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AquaFarmContext>();
-
-    if (dbContext.Database.CanConnect())
-    {
-        Console.WriteLine("Ket noi thanh cong.");
-    }
-    else
-    {
-        Console.WriteLine("Ket noi that bai.");
-    }
-}
-
 app.Run();

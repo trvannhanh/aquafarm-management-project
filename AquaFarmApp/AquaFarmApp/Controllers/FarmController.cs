@@ -8,7 +8,6 @@ namespace AquaFarmApp.Controllers
     public class FarmController : Controller
     {
         private readonly AquaFarmContext _context;
-
         public FarmController(AquaFarmContext context)
         {
             _context = context;
@@ -25,13 +24,13 @@ namespace AquaFarmApp.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Farm farm)
+        public async Task<IActionResult> Create(Farm farm)
         {
             if (ModelState.IsValid)
             {
                 _context.Farms.Add(farm);
-                _context.SaveChanges();
-
+                await _context.SaveChangesAsync();
+                farm.CreatedAt = DateTime.Now;
                 TempData["CreatedFarmId"] = farm.FarmId;
                 TempData["AreaTotal"] = farm.AreaTotal;
                 return RedirectToAction("CreateAreas", "Area");
@@ -39,15 +38,15 @@ namespace AquaFarmApp.Controllers
             return View(farm);
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var farms = _context.Farms.Include(f => f.Areas).ToList();
+            var farms = await _context.Farms.Include(f => f.Areas).ToListAsync();
             return View(farms);
         }
 
-        public IActionResult Details(int id)
+        public async Task<IActionResult> Details(int id)
         {
-            var farm = _context.Farms.Include(f => f.Areas).FirstOrDefault(f => f.FarmId == id);
+            var farm = await _context.Farms.Include(f => f.Areas).FirstOrDefaultAsync(f => f.FarmId == id);
             if (farm == null) return NotFound();
             return View(farm);
         }
