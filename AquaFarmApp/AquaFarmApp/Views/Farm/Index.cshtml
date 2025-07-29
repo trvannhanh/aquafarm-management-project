@@ -1,10 +1,13 @@
 ﻿@model List<AquaFarmApp.Models.Farm>
-<h2>Danh sách Farm</h2>
+<h2>Farms List</h2>
 <ul>
     @foreach (var farm in Model)
     {
         <li>
-            <a asp-controller="Farm" asp-action="Details" asp-route-id="@farm.FarmId" >@farm.FarmName</a>
+            <div>@farm.FarmName</div>
+            <a asp-controller="Farm" asp-action="Details" asp-route-id="@farm.FarmId">Details</a>
+            <a asp-controller="Farm" asp-action="Edit" asp-route-id="@farm.FarmId">Update</a>
+            <a asp-controller="Farm" asp-action="Delete" asp-route-id="@farm.FarmId" onclick="return confirm('Are you sure');"> Delete</a>
         </li>
     }
 </ul>

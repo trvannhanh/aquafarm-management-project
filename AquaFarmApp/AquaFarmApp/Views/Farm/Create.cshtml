@@ -1,17 +1,79 @@
-﻿@model AquaFarmApp.Models.Farm
-<h2>Tạo Farm</h2>
-<form asp-action="Create" method="post">
+﻿@model AquaFarmApp.ViewModels.CreateFarmViewModel
+@{
+    ViewData["Title"] = "Create Farm";
+    var statusList = (List<string>)ViewBag.StatusList;
+    var waterList = (List<string>)ViewBag.WaterList;
+}
+
+<h2>Create Farm</h2>
+
+<form method="post" id="farmForm">
     <div>
         <label>Farm Name:</label>
-        <input asp-for="FarmName" />
+        <input asp-for="FarmName" class="form-control" />
+        <span asp-validation-for="FarmName" class="text-danger"></span>
     </div>
     <div>
         <label>Location:</label>
-        <input asp-for="FarmLocation" />
+        <input asp-for="FarmLocation" class="form-control" />
+        <span asp-validation-for="FarmLocation" class="text-danger"></span>
     </div>
     <div>
-        <label>Số lượng khu vực:</label>
-        <input asp-for="AreaTotal" type="number" />
+        <label>Number of Areas:</label>
+        <input asp-for="AreaTotal" id="areaTotal" class="form-control" type="number" min="1" />
+        <span asp-validation-for="AreaTotal" class="text-danger"></span>
     </div>
-    <button type="submit">Tạo</button>
+    <button type="button" onclick="generateAreas()">Next</button>
+
+    <div id="areasSection" style="margin-top:20px; display:none;"></div>
+
+    <button type="submit" style="display:none;" id="submitBtn">Create Farm & Areas</button>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function generateAreas() {
+            const total = parseInt(document.getElementById("areaTotal").value);
+            if (isNaN(total) || total < 1) {
+                alert("Please enter valid number of areas.");
+                return;
+            }
+
+            const section = document.getElementById("areasSection");
+            section.innerHTML = ""; // Clear
+
+            const statuses = @Html.Raw(Json.Serialize(statusList));
+            const waters = @Html.Raw(Json.Serialize(waterList));
+
+            for (let i = 0; i < total; i++) {
+                const div = document.createElement("div");
+                div.innerHTML = `
+                    <fieldset style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                        <legend>Area ${i + 1}</legend>
+
+                        <label>Area Name:</label>
+                        <input name="Areas[${i}].AreaName" class="form-control" required />
+
+                        <label>Status:</label>
+                        <select name="Areas[${i}].AreaStatus" class="form-control">
+                            ${statuses.map(s => `<option value="${s}">${s}</option>`).join("")}
+                        </select>
+
+                        <label>Size:</label>
+                        <input type="number" name="Areas[${i}].AreaSize" class="form-control" required />
+
+                        <label>Type of Water:</label>
+                        <select name="Areas[${i}].TypeOfWater" class="form-control">
+                            ${waters.map(w => `<option value="${w}">${w}</option>`).join("")}
+                        </select>
+                    </fieldset>
+                `;
+                section.appendChild(div);
+            }
+
+            section.style.display = "block";
+            document.getElementById("submitBtn").style.display = "inline-block";
+        }
+    </script>
+}

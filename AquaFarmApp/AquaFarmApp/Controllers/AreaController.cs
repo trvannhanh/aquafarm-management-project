@@ -14,40 +14,15 @@ namespace AquaFarmApp.Controllers
             _context = context;
         }
 
-        public IActionResult CreateAreas()
-        {
-            int areaTotal = (int)(TempData["AreaTotal"] ?? 0);
-            int farmId = (int)(TempData["CreatedFarmId"] ?? 0);
-
-            ViewBag.AreaTotal = areaTotal;
-            ViewBag.FarmId = farmId;
-            ViewBag.AreaStatusList = new List<string> { "Avail", "Not Avail", "Health Secured" };
-            ViewBag.TypeOfWaterList = new List<string> { "Freshwater", "Brackish water", "Saltwater", "Recirculated water", "Treated water" };
-
-            return View();
-        }
-
         [HttpPost]
-        public async Task<IActionResult> CreateAreas(List<Area> areas)
-        {
-            if (ModelState.IsValid)
-            {
-                foreach (var area in areas)
-                {
-                    if (string.IsNullOrEmpty(area.AreaStatus))
-                        area.AreaStatus = "Avail";
-                    _context.Areas.Add(area);
-                }
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Menu", "Farm");
-            }
-            return View(areas);
-        }
+
+        private List<string> GetStatus() => new() { "Avail", "Not Avail", "Health Secured" };
+        private List<string> GetWaterType() => new() { "Freshwater", "Brackish water", "Saltwater", "Recirculated water", "Treated water" };
 
         public IActionResult Find()
         {
-            ViewBag.AreaStatusList = new List<string> { "Avail", "Not Avail", "Health Secured" };
-            ViewBag.TypeOfWaterList = new List<string> { "Freshwater", "Brackish water", "Saltwater", "Recirculated water", "Treated water" };
+            ViewBag.AreaStatusList = GetStatus();
+            ViewBag.TypeOfWaterList = GetWaterType();  
             return View();
         }
 
@@ -57,5 +32,59 @@ namespace AquaFarmApp.Controllers
             var areas = await _context.Areas.Where(a => (string.IsNullOrEmpty(areaStatus) || a.AreaStatus == areaStatus) && (string.IsNullOrEmpty(typeOfWater) || a.TypeOfWater == typeOfWater)).ToListAsync();
             return View("FindResult", areas);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var area = await _context.Areas.FindAsync(id);
+            if (area == null) return NotFound();
+
+            ViewBag.StatusList = GetStatus();
+            ViewBag.TypeOfWaterList = GetWaterType();
+
+            return View(area);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, Area updatedArea)
+        {
+            if (id != updatedArea.AreaId) return BadRequest();
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.StatusList = GetStatus();
+                ViewBag.TypeOfWaterList = GetWaterType();
+                return View(updatedArea);
+            }
+
+            var area = await _context.Areas.FindAsync(id);
+            if (area == null) return NotFound();
+
+            area.AreaName = updatedArea.AreaName;
+            area.AreaStatus = updatedArea.AreaStatus;
+            area.TypeOfWater = updatedArea.TypeOfWater;
+            area.AreaSize = updatedArea.AreaSize;
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Details", "Farm", new { id = area.FarmId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var area = await _context.Areas.FindAsync(id);
+
+            var farm = await _context.Farms.FindAsync(area.FarmId);
+            if (farm != null && farm.AreaTotal > 0)
+            {
+                farm.AreaTotal--;
+            }
+            _context.Areas.Remove(area);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", "Farm", new { id = area.FarmId });
+        }
+
+
+
     }
 }

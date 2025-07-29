@@ -1,0 +1,19 @@
+﻿@model AquaFarmApp.Models.Farm
+
+<h2>Farm Update</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="FarmId" />
+
+    <div>
+        <label asp-for="FarmName"></label>
+        <input asp-for="FarmName" />
+    </div>
+
+    <div>
+        <label asp-for="FarmLocation"></label>
+        <input asp-for="FarmLocation" />
+    </div>
+
+    <button type="submit">Update</button>
+</form>
