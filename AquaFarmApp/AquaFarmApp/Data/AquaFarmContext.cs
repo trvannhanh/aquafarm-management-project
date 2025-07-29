@@ -36,7 +36,7 @@ public partial class AquaFarmContext : IdentityDbContext<User, IdentityRole<int>
 
     public virtual DbSet<LiveStockTran> LiveStockTrans { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<User> User { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -145,7 +145,7 @@ public partial class AquaFarmContext : IdentityDbContext<User, IdentityRole<int>
             entity.Property(e => e.AccessFailedCount).HasColumnName("access_failed_count");
 
             // Ánh xạ các thuộc tính tùy chỉnh
-            entity.Property(e => e.Fullname).HasColumnName("fullname").HasMaxLength(50);
+            entity.Property(e => e.FullName).HasColumnName("fullname").HasMaxLength(50);
             entity.Property(e => e.Role).HasColumnName("role").HasMaxLength(10).IsUnicode(false);
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at").HasColumnType("datetime");

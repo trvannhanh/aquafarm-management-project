@@ -10,102 +10,120 @@ namespace AquaFarmApp.Controllers
     {
         private readonly SignInManager<User> signInManager;
         private readonly UserManager<User> userManager;
+        private readonly RoleManager<IdentityRole<int>> roleManager;
 
-        public AccountController(SignInManager<User> signInManager, UserManager<User> userManager)
+        public AccountController(SignInManager<User> signInManager, UserManager<User> userManager, RoleManager<IdentityRole<int>> roleManager)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
+            this.roleManager = roleManager;
         }
 
+        [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var result = await signInManager.PasswordSignInAsync(
-                    model.Email,
-                    model.Password,
-                    model.RememberMe,
-                    false);
-
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Email or password is incorrect.");
-                    return View(model);
-                }
+                return View(model);
             }
-            return View(model);
+
+            var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            ModelState.AddModelError(string.Empty, "Invalid Login Attempt.");
+            return View(model); 
         }
 
+        [HttpGet]
         public IActionResult Register()
         {
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                User user = new User
-                {
-                    Fullname = model.Name,
-                    Email = model.Email,
-                    UserName = model.Email,
-                };
-                var result = await userManager.CreateAsync(user, model.Password);
-
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Login", "Account");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
-
-                    return View(model);
-                }
+                return View(model);
             }
+
+            var user = new User
+            {
+                FullName = model.Name,
+                UserName = model.Email,
+                NormalizedUserName = model.Email.ToUpper(),
+                Email = model.Email,
+                NormalizedEmail = model.Email.ToUpper()
+            };
+
+            var result = await userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                var roleExist = await roleManager.RoleExistsAsync("Staff");
+
+                if (!roleExist)
+                {
+                    var role = new IdentityRole<int> { Name = "Staff", NormalizedName = "STAFF" };
+                    await roleManager.CreateAsync(role);
+                }
+
+                await userManager.AddToRoleAsync(user, "Staff");
+
+                await signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Login", "Account");
+            }
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
             return View(model);
         }
 
+        [HttpGet]
         public IActionResult VerifyEmail()
         {
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> VerifyEmail(VerifyEmailViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = await userManager.FindByNameAsync(model.Email);
-                if (user == null)
-                {
-                    ModelState.AddModelError("", "Email not found.");
-                    return View(model);
-                }
-                else
-                {
-                    return RedirectToAction("ChangePassword", "Account", new { username = user.UserName });
-                }
-
+                return View(model);
             }
-            return View(model);
+
+            var user = await userManager.FindByNameAsync(model.Email);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "User not found!");
+                return View(model);
+            }
+            else
+            {
+                return RedirectToAction("ChangePassword", "Account", new { username = user.UserName });
+            }
         }
 
+        [HttpGet]
         public IActionResult ChangePassword(string username)
         {
             if (string.IsNullOrEmpty(username))
@@ -118,41 +136,39 @@ namespace AquaFarmApp.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var user = await userManager.FindByNameAsync(model.Email);
-                if (user != null)
-                {
-                    var result = await userManager.RemovePasswordAsync(user);
-                    if (result.Succeeded)
-                    {
-                        result = await userManager.AddPasswordAsync(user, model.NewPassword);
-                        return RedirectToAction("Login", "Account");
-                    }
-                    else
-                    {
-                        foreach (var error in result.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
+                ModelState.AddModelError("", "Something went wrong");
+                return View(model);
+            }
 
-                        return View(model);
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Email not found");
-                    return View(model);
-                }
+            var user = await userManager.FindByNameAsync(model.Email);
 
+            if (user == null)
+            {
+                ModelState.AddModelError("", "User not found!");
+                return View(model);
+            }
+
+            var result = await userManager.RemovePasswordAsync(user);
+            if (result.Succeeded)
+            {
+                result = await userManager.AddPasswordAsync(user, model.NewPassword);
+                return RedirectToAction("Login", "Account");
             }
             else
             {
-                ModelState.AddModelError("", "Something went wrong!!Try again");
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+
                 return View(model);
             }
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
