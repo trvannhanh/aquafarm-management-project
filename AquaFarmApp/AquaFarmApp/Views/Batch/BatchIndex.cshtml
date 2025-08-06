@@ -1,0 +1,97 @@
+﻿@using AquaFarmApp.Models
+@using AquaFarmApp.ViewModels
+@model PaginatedList<BatchViewModel>
+
+<h2>Danh sách lứa nuôi</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@Html.Encode(TempData["Success"])</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@Html.Encode(TempData["Error"])</div>
+}
+
+<p>
+    <a asp-action="CreateBatch" class="btn btn-primary">Tạo lứa nuôi mới</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Batch ID</th>
+            <th>Source</th>
+            <th>Aquatic Breed</th>
+            <th>Total Quantity</th>
+            <th>Start Date</th>
+            <th>Estimated Harvest Date</th>
+            <th>Status</th>
+            <th>Assigned Areas</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var batch in Model)
+            {
+                <tr>
+                    <td>@batch.BatchId</td>
+                    <td>@batch.Source</td>
+                    <td>@batch.AquaticBreed</td>
+                    <td>@batch.TotalQuantity</td>
+                    <td>@batch.StartDate.ToString("dd/MM/yyyy")</td>
+                    <td>@batch.EstimatedHarvestDate.ToString("dd/MM/yyyy")</td>
+                    <td>@batch.BatchStatus</td>
+                    <td>@batch.AssignedAreaCount</td>
+                    <td>
+                        <a asp-action="Details" asp-controller="Batch" asp-route-id="@batch.BatchId" class="btn btn-info btn-sm">Details</a>
+                        <a asp-action="Edit" asp-controller="Batch" asp-route-id="@batch.BatchId" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Delete" asp-controller="Batch" asp-route-id="@batch.BatchId" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa lứa nuôi này?')">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="9">Không có lứa nuôi nào.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model != null)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="BatchIndex" asp-route-page="@(Model.PageIndex - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
+                </li>
+            }
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-action="BatchIndex" asp-route-page="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                </li>
+            }
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="BatchIndex" asp-route-page="@(Model.PageIndex + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm('Bạn có chắc muốn xóa lứa nuôi này?');
+        }
+    </script>
+}

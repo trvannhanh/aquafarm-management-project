@@ -1,0 +1,127 @@
+﻿@using AquaFarmApp.ViewModels
+@model AssignAreaViewModel
+
+<h2>Assign Areas</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@Html.Encode(TempData["Error"])</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@Html.Encode(TempData["Success"])</div>
+}
+
+<form id="area-form" method="post" asp-controller="Batch" asp-action="AssignArea">
+    <input type="hidden" asp-for="BatchId" />
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Select</th>
+                <th>Area Name</th>
+                <th>Water Type</th>
+                <th>Area Size</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody id="area-table-body">
+            @if (ViewData["AvailableAreas"] != null)
+            {
+                var areas = ViewData["AvailableAreas"] as List<AquaFarmApp.Models.Area>;
+                @foreach (var area in areas)
+                {
+                    var areaBatch = Model.AreaBatches?.FirstOrDefault(ab => ab.AreaId == area.AreaId);
+                    var isChecked = areaBatch != null && areaBatch.Quantity > 0;
+                    <tr data-area-id="@area.AreaId">
+                        <td>
+                            <input type="checkbox"
+                                   name="selectedAreas"
+                                   value="@area.AreaId"
+                                   @(isChecked ? "checked" : "")
+                                   onchange="toggleQuantityInput(this, @area.AreaId)" />
+                        </td>
+                        <td>@(area.AreaName ?? "Unknown")</td>
+                        <td>@(area.TypeOfWater ?? "Unknown")</td>
+                        <td>@(area.AreaSize.ToString() ?? "0")</td>
+                        <td>
+                            <input type="number"
+                                   class="form-control quantity-input"
+                                   data-name-template="AreaBatches[{0}].Quantity"
+                                   min="1"
+                                   value="@(isChecked? areaBatch?.Quantity.ToString() : "")"
+                                   disabled="@(!isChecked)" />
+                            <input type="hidden"
+                                   class="area-id-input"
+                                   data-name-template="AreaBatches[{0}].AreaId"
+                                   value="@area.AreaId"
+                                   disabled="@(!isChecked)" />
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr><td colspan="5">Không có khu vực nào để phân bổ.</td></tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-success">Confirm Assignment</button>
+    <button type="button" class="btn btn-secondary" onclick="goBack()">Back</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        let areaBatchIndex = 0;
+
+        function toggleQuantityInput(checkbox, areaId) {
+            var $row = $(checkbox).closest('tr');
+            var $quantityInput = $row.find('.quantity-input');
+            var $areaIdInput = $row.find('.area-id-input');
+
+            if (checkbox.checked) {
+                $quantityInput.prop('disabled', false);
+                $areaIdInput.prop('disabled', false);
+                if (!$quantityInput.val()) {
+                    $quantityInput.val(1); // Gán giá trị mặc định là 1
+                }
+                // Gán tên động cho input
+                $quantityInput.attr('name', `AreaBatches[${areaBatchIndex}].Quantity`);
+                $areaIdInput.attr('name', `AreaBatches[${areaBatchIndex}].AreaId`);
+                areaBatchIndex++;
+            } else {
+                $quantityInput.prop('disabled', true).val('');
+                $areaIdInput.prop('disabled', true);
+                $quantityInput.removeAttr('name');
+                $areaIdInput.removeAttr('name');
+            }
+        }
+
+        $('#area-form').on('submit', function () {
+            // Reset index trước khi gửi form
+            areaBatchIndex = 0;
+            $('input[name="selectedAreas"]').each(function () {
+                var $checkbox = $(this);
+                var areaId = $checkbox.val();
+                var $row = $checkbox.closest('tr');
+                var $quantityInput = $row.find('.quantity-input');
+                var $areaIdInput = $row.find('.area-id-input');
+
+                if ($checkbox.is(':checked')) {
+                    // Gán lại tên cho các input được chọn
+                    $quantityInput.attr('name', `AreaBatches[${areaBatchIndex}].Quantity`);
+                    $areaIdInput.attr('name', `AreaBatches[${areaBatchIndex}].AreaId`);
+                    areaBatchIndex++;
+                } else {
+                    // Xóa tên để không gửi
+                    $quantityInput.prop('disabled', true).removeAttr('name');
+                    $areaIdInput.prop('disabled', true).removeAttr('name');
+                }
+            });
+        });
+
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+}

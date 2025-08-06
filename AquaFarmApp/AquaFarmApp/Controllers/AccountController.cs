@@ -124,6 +124,7 @@ namespace AquaFarmApp.Controllers
         }
 
         [HttpGet]
+
         public IActionResult ChangePassword(string username)
         {
             if (string.IsNullOrEmpty(username))
