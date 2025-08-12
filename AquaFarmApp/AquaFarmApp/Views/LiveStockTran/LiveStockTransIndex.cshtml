@@ -1,0 +1,95 @@
+﻿@using AquaFarmApp.Models
+@using AquaFarmApp.ViewModels
+@model PaginatedList<LiveStockTranViewModel>
+
+<h2>Danh sách Nhập Xuất</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@Html.Encode(TempData["Success"])</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@Html.Encode(TempData["Error"])</div>
+}
+
+<p>
+    <a asp-action="" class="btn btn-primary">Tạo giao dịch mới</a>
+</p>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>AreaBatchId</th>
+            <th>AreaName</th>
+            <th>Batch Aquatic Breed</th>
+            <th>TransDate</th>
+            <th>Quantity</th>
+            <th>TransType</th>
+            <th>Note</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var trans in Model)
+            {
+                <tr>
+                    <td>@trans.AreaBatchId</td>
+                    <td>@trans.AreaName</td>
+                    <td>@trans.BatchName</td>
+                    <td>@trans.TransDate.ToString("dd/MM/yyyy")</td>
+                    <td>@trans.Quantity</td>
+                    <td>@trans.TransType</td>
+                    <td>@trans.Note</td>
+                    <td>
+                        <a asp-action="Details" asp-controller="" asp-route-id="" class="btn btn-info btn-sm">Details</a>
+                        <a asp-action="Edit" asp-controller="" asp-route-id="" class="btn btn-warning btn-sm">Edit</a>
+                        <a asp-action="Delete" asp-controller="" asp-route-id="" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa giao dịch này?')">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="9">Không có giao dịch nào.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model != null)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="LiveStockTransIndex" asp-route-page="@(Model.PageIndex - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
+                </li>
+            }
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-action="LiveStockTransIndex" asp-route-page="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                </li>
+            }
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="LiveStockTransIndex" asp-route-page="@(Model.PageIndex + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm('Bạn có chắc muốn xóa giao dịch này?');
+        }
+    </script>
+}

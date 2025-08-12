@@ -40,7 +40,7 @@ namespace AquaFarmApp.Controllers
                               };
 
             var paginatedList = PaginatedList<AreaBatchViewModel>.Create(areaBatches, page, pageSize);
-            return View("Index", paginatedList);
+            return View("AreaBatchIndex", paginatedList);
         }
 
         // Danh sách Batch

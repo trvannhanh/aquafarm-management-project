@@ -12,9 +12,6 @@ public partial class LiveStockTran
     [Column("transaction_id")]
     public int TransactionId { get; set; }
 
-    [Column("price_per_unit")]
-    public double PricePerUnit { get; set; }
-
     [Column("trans_type")]
     [StringLength(10)]
     [Unicode(false)]
@@ -28,17 +25,17 @@ public partial class LiveStockTran
     public int Quantity { get; set; }
 
     [Column("trans_date", TypeName = "datetime")]
-    public DateTime? TransDate { get; set; }
+    public DateTime TransDate { get; set; }
 
     [Column("note")]
     [StringLength(255)]
     public string? Note { get; set; }
 
     [Column("user_id")]
-    public int? UserId { get; set; }
+    public int UserId { get; set; }
 
     [Column("areabatch_id")]
-    public int? AreabatchId { get; set; }
+    public int AreabatchId { get; set; }
 
     [ForeignKey("AreabatchId")]
     [InverseProperty("LiveStockTrans")]
@@ -47,4 +44,5 @@ public partial class LiveStockTran
     [ForeignKey("UserId")]
     [InverseProperty("LiveStockTrans")]
     public virtual User? User { get; set; }
+
 }
