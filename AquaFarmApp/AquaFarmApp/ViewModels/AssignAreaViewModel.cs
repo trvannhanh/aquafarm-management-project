@@ -17,7 +17,7 @@ namespace AquaFarmApp.ViewModels
                 yield return new ValidationResult(
                     "AreaBatches cannot be null.",
                     new[] { nameof(AreaBatches) });
-                yield break;
+                yield break; 
             }
 
             if (!AreaBatches.Any(ab => ab.Quantity > 0))

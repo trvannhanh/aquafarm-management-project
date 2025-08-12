@@ -1,0 +1,97 @@
+﻿@model AquaFarmApp.ViewModels.EnvironmentReportViewModel
+
+@{
+    ViewData["Title"] = "Báo Cáo Biến Động Môi Trường";
+}
+
+<h2>Báo Cáo Thống Kê Biến Động Môi Trường</h2>
+
+<!-- Form lọc dữ liệu (tùy chọn) -->
+<form asp-action="EnvironmentReport" method="get">
+    <div class="form-group">
+        <label for="areaId">Khu Vực (AreaId):</label>
+        <input type="number" name="areaId" value="@Model.AreaId" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="fromDate">Từ Ngày:</label>
+        <input type="date" name="fromDate" value="@(Model.FromDate?.ToString("yyyy-MM-dd"))" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="toDate">Đến Ngày:</label>
+        <input type="date" name="toDate" value="@(Model.ToDate?.ToString("yyyy-MM-dd"))" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Lọc</button>
+</form>
+
+<!-- Canvas cho biểu đồ -->
+@if (!Model.Dates.Any())
+{
+    <p>Không có dữ liệu báo cáo cho các khu vực của bạn.</p>
+}
+else
+{
+    <canvas id="environmentChart" width="800" height="400"></canvas>
+}
+
+
+<script>
+    // Chuẩn bị dữ liệu từ Model (chuyển sang JSON)
+    var dates = @Html.Raw(Json.Serialize(Model.Dates.Select(d => d.ToString("yyyy-MM-dd HH:mm")))); 
+    var temperatures = @Html.Raw(Json.Serialize(Model.Temperatures));
+    var phLevels = @Html.Raw(Json.Serialize(Model.PhLevels));
+    var oxygenLevels = @Html.Raw(Json.Serialize(Model.OxygenLevels));
+    var salinities = @Html.Raw(Json.Serialize(Model.Salinities));
+
+    // Cấu hình Chart.js
+    var ctx = document.getElementById('environmentChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'line', // Biểu đồ đường
+        data: {
+            labels: dates, // Trục X: Thời gian
+            datasets: [
+                {
+                    label: 'Nhiệt Độ (°C)',
+                    data: temperatures,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    fill: false
+                },
+                {
+                    label: 'Độ pH',
+                    data: phLevels,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    fill: false
+                },
+                {
+                    label: 'Nồng Độ Oxy (mg/L)',
+                    data: oxygenLevels,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: false
+                },
+                {
+                    label: 'Độ Mặn (ppt)',
+                    data: salinities,
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Thời Gian' }
+                },
+                y: {
+                    title: { display: true, text: 'Giá Trị' }
+                }
+            },
+            plugins: {
+                legend: { display: true }
+            }
+        }
+    });
+</script>
