@@ -1,0 +1,149 @@
+﻿@model List<AquaFarmApp.ViewModels.AreaIndexViewModel>
+
+<html>
+<head>
+    <title>Area List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f4f7;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #006994;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        ul.area-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+            ul.area-list li.area-card {
+                background-color: white;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 3px 7px rgba(0,0,0,0.1);
+                transition: box-shadow 0.3s ease, transform 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+                ul.area-list li.area-card:hover {
+                    box-shadow: 0 0 15px 3px rgba(0, 105, 148, 0.7);
+                    transform: translateY(-2px);
+                }
+
+        /* Hiệu ứng cảnh báo */
+        .area-card.warning {
+            border: 2px solid red;
+            background-color: #ffe6e6;
+            animation: pulseWarning 1.5s infinite;
+        }
+
+        @@keyframes pulseWarning {
+            0%
+
+        {
+            box-shadow: 0 0 8px red;
+        }
+
+        50% {
+            box-shadow: 0 0 16px red;
+        }
+
+        100% {
+            box-shadow: 0 0 8px red;
+        }
+
+        }
+
+        .area-info {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #004c6d;
+        }
+
+        .area-details {
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .btn-group {
+            margin-top: auto;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            user-select: none;
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-history {
+            background-color: #006994;
+            box-shadow: 0 0 8px rgba(0, 105, 148, 0.7);
+        }
+
+            .btn-history:hover {
+                background-color: #005f80;
+                box-shadow: 0 0 16px rgba(0, 105, 148, 0.9);
+            }
+
+        .btn-create {
+            background-color: #28a745;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.7);
+        }
+
+            .btn-create:hover {
+                background-color: #218838;
+                box-shadow: 0 0 16px rgba(40, 167, 69, 0.9);
+            }
+    </style>
+</head>
+<body>
+    <h2>Area List</h2>
+
+    <ul class="area-list">
+        @foreach (var area in Model)
+        {
+            var isWarning = area.EnvWarn ?? false;
+
+            <li class="area-card @(isWarning ? "warning" : "")" title="@area.AreaName">
+                <div class="area-info">@area.AreaName</div>
+                <div class="area-details">
+                    Status: @area.AreaStatus <br />
+                    Water Type: @area.TypeOfWater <br />
+                    EnvCheck: @(area.EnvCheck != null ? area.EnvCheck.ToString() : "Not Check")
+                </div>
+
+                <div class="btn-group">
+                    <a asp-controller="Area" asp-action="EnvHis" asp-route-id="@area.AreaId" class="btn btn-history" title="View EnvCheck History">
+                        <i class="fas fa-history"></i> EnvCheck History
+                    </a>
+                    <a asp-controller="EnvironmentLog" asp-action="Create" asp-route-id="@area.AreaId" class="btn btn-create" title="Create EnvCheck">
+                        <i class="fas fa-plus-circle"></i> Create EnvCheck
+                    </a>
+                </div>
+            </li>
+        }
+    </ul>
+</body>
+</html>
