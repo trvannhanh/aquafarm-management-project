@@ -40,10 +40,10 @@ public partial class HarvestSale
     public string? Note { get; set; }
 
     [Column("user_id")]
-    public int? UserId { get; set; }
+    public int UserId { get; set; }
 
     [Column("areabatch_id")]
-    public int? AreabatchId { get; set; }
+    public int AreabatchId { get; set; }
 
     [ForeignKey("AreabatchId")]
     [InverseProperty("HarvestSales")]
