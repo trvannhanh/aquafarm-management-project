@@ -68,7 +68,7 @@ public partial class User : IdentityUser<int>
 
     [Column("fullname")]
     [StringLength(50)]
-    public string Fullname { get; set; } = null!;
+    public string FullName { get; set; } = null!;
 
     [Column("role")]
     [StringLength(10)]

@@ -25,6 +25,24 @@ namespace AquaFarmApp.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
+        public IActionResult Admin()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Owner")]
+        public IActionResult Owner()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Staff")]
+        public IActionResult Staff()
+        {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
