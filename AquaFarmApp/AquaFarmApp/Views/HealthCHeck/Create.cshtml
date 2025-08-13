@@ -1,0 +1,32 @@
+﻿@model AquaFarmApp.ViewModels.CreateHealthCheckViewModel
+@{
+    var statusList = (List<string>)ViewBag.StatusList;
+}
+<form method="post" id="healthForm">
+    @Html.AntiForgeryToken()
+    <input asp-for="AreaBatchId" type="hidden" />
+    <div>
+        <label>Disease Signs:</label>
+        <input asp-for="DiseaseSigns" class="form-control" />
+        <span asp-validation-for="DiseaseSigns" class="text-danger"></span>
+    </div>
+    <div>
+        <label>Status:</label>
+        <select asp-for="HealthStatus" class="form-control" asp-items="@(new SelectList(ViewBag.StatusList))">
+            <option value="">Select Status</option>
+        </select>
+    </div>
+    <div>
+        <label>Time:</label>
+        <select asp-for="HealthStatus" class="form-control" asp-items="@(new SelectList(ViewBag.StatusList))">
+            <option value="">Select Status</option>
+        </select>
+    </div>
+    <div>
+        <label>Note:</label>
+        <input asp-for="Notes" class="form-control" />
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Create Check</button>
+</form>

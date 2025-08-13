@@ -1,0 +1,50 @@
+﻿@model AquaFarmApp.Models.AreaBatch
+
+<div class="container mt-4">
+    <h2 class="text-primary mb-4">
+        🗂 History of: <span class="fw-bold">@Model.Id</span> - <span class="fw-bold">@Model.Id</span>
+    </h2>
+
+    @if (Model.HealthChecks != null && Model.HealthChecks.Any())
+    {
+        <div class="table-responsive shadow-sm rounded">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Time</th>
+                        <th>Disease Signs</th>
+                        <th>Status</th>
+                        <th>Note</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in Model.HealthChecks)
+                    {
+                        var isDanger = log.HealthStatus?.ToLower() == "warning" || log.HealthStatus?.ToLower() == "critical";
+
+                        <tr class="@(isDanger ? "table-danger" : "")">
+                            <td>@log.CheckDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@log.DiseaseSigns</td>
+                            <td>
+                                <span class="badge @(isDanger ? "bg-danger" : "bg-success")">
+                                    @log.HealthStatus
+                                </span>
+                            </td>
+                            <td>@log.Notes</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            No health check data available.
+        </div>
+    }
+
+    <a asp-action="Index" asp-controller="Area" class="btn btn-secondary mt-3">
+        ⬅ Back to Area List
+    </a>
+</div>
