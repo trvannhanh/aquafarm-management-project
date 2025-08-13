@@ -14,10 +14,13 @@ public partial class AreaBatch
     public int Id { get; set; }
 
     [Column("area_id")]
-    public int? AreaId { get; set; }
+    public int AreaId { get; set; }
 
     [Column("batch_id")]
-    public int? BatchId { get; set; }
+    public int BatchId { get; set; }
+
+    [Column("quantity")]
+    public int Quantity { get; set; }
 
     [ForeignKey("AreaId")]
     [InverseProperty("AreaBatches")]

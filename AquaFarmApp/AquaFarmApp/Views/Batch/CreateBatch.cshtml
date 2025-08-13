@@ -1,0 +1,57 @@
+﻿@using AquaFarmApp.ViewModels
+@model CreateBatchViewModel
+@{
+    ViewData["Title"] = "Create New Batch";
+}
+
+<h1>Create New Batch</h1>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@Html.Encode(TempData["Error"])</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@Html.Encode(TempData["Success"])</div>
+}
+
+<div id="create-batch-form" class="card p-4">
+    <form id="batch-form" method="post" asp-controller="Batch" asp-action="CreateBatch">
+        @Html.AntiForgeryToken()
+        <div class="form-group">
+            <label asp-for="Source">Source</label>
+            <input asp-for="Source" class="form-control" required />
+            <span asp-validation-for="Source" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="AquaticBreed">Aquatic Breed</label>
+            <input asp-for="AquaticBreed" class="form-control" required />
+            <span asp-validation-for="AquaticBreed" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="StartDate">Start Date</label>
+            <input asp-for="StartDate" type="date" class="form-control" required />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="EstimatedHarvestDate">Estimated Harvest Date</label>
+            <input asp-for="EstimatedHarvestDate" type="date" class="form-control" required />
+            <span asp-validation-for="EstimatedHarvestDate" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="TotalQuantity">Total Quantity</label>
+            <input asp-for="TotalQuantity" type="number" class="form-control" required min="1" />
+            <span asp-validation-for="TotalQuantity" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Continue</button>
+    </form>
+</div>
+
+
+<div id="area-selection" class="card p-4 mt-4" style="display: none;">
+    @* Nội dung sẽ được thay bằng view AssignArea sau khi redirect *@
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

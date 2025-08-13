@@ -1,0 +1,86 @@
+﻿@using AquaFarmApp.Models
+@using AquaFarmApp.ViewModels
+@model PaginatedList<AreaBatchViewModel>
+
+<h2>Danh sách phân bổ khu vực</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@Html.Encode(TempData["Success"])</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@Html.Encode(TempData["Error"])</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Area Name</th>
+            <th>Batch ID</th>
+            <th>Quantity</th>
+            <th>Aquatic Breed</th>
+            <th>Batch Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var areaBatch in Model)
+            {
+                <tr>
+                    <td>@areaBatch.AreaName</td>
+                    <td>@areaBatch.BatchId</td>
+                    <td>@areaBatch.Quantity</td>
+                    <td>@areaBatch.AquaticBreed</td>
+                    <td>@areaBatch.BatchStatus</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-info btn-sm">Details</a>
+                        <a asp-action="DeleteAreaBatch" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa phân bổ này?')">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6">Không có bản ghi phân bổ nào.</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@if (Model != null)
+{
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="AreaBatchIndex" asp-route-page="@(Model.PageIndex - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
+                </li>
+            }
+            @for (var i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link" asp-action="AreaBatchIndex" asp-route-page="@i" asp-route-pageSize="@Model.PageSize">@i</a>
+                </li>
+            }
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="AreaBatchIndex" asp-route-page="@(Model.PageIndex + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@section Scripts {
+    <script>
+        function confirmDelete() {
+            return confirm('Bạn có chắc muốn xóa phân bổ này?');
+        }
+    </script>
+}

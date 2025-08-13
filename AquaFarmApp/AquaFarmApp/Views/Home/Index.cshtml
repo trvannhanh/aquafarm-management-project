@@ -2,7 +2,158 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid mt-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-primary">Tổng quan hệ thống</h1>
+        <a asp-controller="Farm" asp-action="Create" class="btn btn-primary">Thêm trang trại mới</a>
+    </div>
+
+    <!-- Thống kê nhanh -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng số trang trại</div>
+                            @* <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalFarms</div> *@
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-farm fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Tổng số khu vực</div>
+                            @* <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalAreas</div> *@
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">1</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-water fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Tổng số lô nuôi</div>
+                            @* <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalBatches</div> *@
+                            <div>1</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-fish fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách trang trại -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Danh sách trang trại</h6>
+        </div>
+        <div class="card-body">
+            @* @if (Model.Farms.Any()) *@
+            {
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="farmTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Tên trang trại</th>
+                                <th>Địa chỉ</th>
+                                <th>Số khu vực</th>
+                                <th>Số lô nuôi</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @* @foreach (var farm in Model.Farms) *@
+                            {
+                                <tr>
+                                    <td>1</td>
+                                    <td>2</td>
+                                    <td>3</td>
+                                    <td>4</td>
+                                    @* <td>@farm.FarmName</td>
+                                    <td>@farm.Address</td>
+                                    <td>@farm.Areas.Count</td> *@
+                                    @* <td>@farm.Areas.Sum(a => a.AreaBatches.Count)</td> *@
+                                    <td>
+                                        @* <a asp-controller="Farm" asp-action="Details" asp-route-id="@farm.FarmId" class="btn btn-sm btn-info">Chi tiết</a>
+                                        <a asp-controller="Farm" asp-action="Edit" asp-route-id="@farm.FarmId" class="btn btn-sm btn-warning">Sửa</a>
+                                        <a asp-controller="Farm" asp-action="Delete" asp-route-id="@farm.FarmId" class="btn btn-sm btn-danger">Xóa</a> *@
+                                        <a>A</a>
+                                        <a>A</a>
+                                        <a>A</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">Hiện tại chưa có trang trại nào. Vui lòng thêm trang trại mới.</p>
+            }
+        </div>
+    </div>
+
+    <!-- Biểu đồ thống kê (tùy chọn) -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Thống kê lô nuôi</h6>
+        </div>
+        <div class="card-body">
+            <canvas id="batchChart"></canvas>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <!-- Bootstrap và Font Awesome -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    @* <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var ctx = document.getElementById('batchChart').getContext('2d');
+            var batchChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(Model.Farms.Select(f => f.FarmName))),
+                    datasets: [{
+                        label: 'Số lô nuôi',
+                        data: @Html.Raw(Json.Serialize(Model.Farms.Select(f => f.Areas.Sum(a => a.AreaBatches.Count)))),
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    </script> *@
+}

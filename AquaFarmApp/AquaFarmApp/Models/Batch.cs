@@ -32,6 +32,9 @@ public partial class Batch
     [Column("estimated_harvest_date", TypeName = "datetime")]
     public DateTime EstimatedHarvestDate { get; set; }
 
+    [Column("total_quantity")]
+    public int TotalQuantity { get; set; }
+
     [InverseProperty("Batch")]
     public virtual ICollection<AreaBatch> AreaBatches { get; set; } = new List<AreaBatch>();
 }
