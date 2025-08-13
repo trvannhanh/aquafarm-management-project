@@ -2,32 +2,69 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace AquaFarmApp.Models;
 
 [Table("User")]
-[Index("Username", Name = "UQ__User__F3DBC572A7B6B1EE", IsUnique = true)]
-public partial class User
+[Index("UserName", Name = "UQ__User__F3DBC572A7B6B1EE", IsUnique = true)]
+public partial class User : IdentityUser<int>
 {
     [Key]
     [Column("user_id")]
-    public int UserId { get; set; }
+    public override int Id { get; set; } // Ghi đè Id để ánh xạ với user_id
 
     [Column("username")]
     [StringLength(50)]
     [Unicode(false)]
-    public string Username { get; set; } = null!;
+    public override string UserName { get; set; } = null!; // Ghi đè UserName
 
     [Column("password")]
     [StringLength(255)]
     [Unicode(false)]
-    public string Password { get; set; } = null!;
+    public override string PasswordHash { get; set; } = null!; // Ghi đè PasswordHash
 
     [Column("email")]
     [StringLength(100)]
     [Unicode(false)]
-    public string? Email { get; set; }
+    public override string? Email { get; set; } // Ghi đè Email
+
+    [Column("normalized_user_name")]
+    [StringLength(256)]
+    [Unicode(false)]
+    public override string? NormalizedUserName { get; set; }
+
+    [Column("normalized_email")]
+    [StringLength(256)]
+    [Unicode(false)]
+    public override string? NormalizedEmail { get; set; }
+
+    [Column("email_confirmed")]
+    public override bool EmailConfirmed { get; set; }
+
+    [Column("access_failed_count")]
+    public override int AccessFailedCount { get; set; }
+
+    [Column("concurrency_stamp")]
+    public override string? ConcurrencyStamp { get; set; }
+
+    [Column("lockout_end")]
+    public override DateTimeOffset? LockoutEnd { get; set; }
+
+    [Column("lockout_enabled")]
+    public override bool LockoutEnabled { get; set; }
+
+    [Column("two_factor_enabled")]
+    public override bool TwoFactorEnabled { get; set; }
+
+    [Column("phone_number")]
+    [StringLength(50)]
+    [Unicode(false)]
+    public override string? PhoneNumber { get; set; }
+
+    [Column("phone_number_confirmed")]
+    public override bool PhoneNumberConfirmed { get; set; }
 
     [Column("fullname")]
     [StringLength(50)]

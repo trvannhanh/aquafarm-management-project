@@ -37,6 +37,7 @@ ScaffoldingReadMe.txt
 *.snupkg
 
 # Others
+WordSoulApi/.vs/
 ~$*
 *~
 CodeCoverage/
@@ -52,5 +53,4 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
-
 .vs/
