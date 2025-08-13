@@ -6,6 +6,7 @@
         public int AreaId { get; set; }
         public string AreaName { get; set; }
         public int BatchId { get; set; }
+        public string BatchName { get; set; }
         public int Quantity { get; set; }
         public string AquaticBreed { get; set; }
         public string BatchStatus { get; set; }

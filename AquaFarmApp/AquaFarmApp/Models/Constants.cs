@@ -23,4 +23,10 @@
         Recirculated,
         Treated
     }
+
+    public enum TransType
+    {
+        Import,
+        Export
+    }
 }

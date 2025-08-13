@@ -36,7 +36,8 @@
                     <td>@areaBatch.AquaticBreed</td>
                     <td>@areaBatch.BatchStatus</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-info btn-sm">Details</a>
+                        <a asp-controller="LiveStockTran" asp-action="CreateTrans" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-info btn-sm" >Create Transaction</a>
+                        <a asp-controller="LiveStockTran" asp-action="LiveStockTransIndex" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-info btn-sm">Details</a>
                         <a asp-action="DeleteAreaBatch" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa phân bổ này?')">Delete</a>
                     </td>
                 </tr>
