@@ -1,4 +1,4 @@
-﻿using AquaFarmApp.Data;
+using AquaFarmApp.Data;
 using AquaFarmApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllersWithViews();
+
 // Thêm DbContext
 builder.Services.AddDbContext<AquaFarmContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -26,7 +27,13 @@ builder.Services.AddIdentity<User, IdentityRole<int>>( options =>
     .AddEntityFrameworkStores<AquaFarmContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AquaFarm API", Version = "v1" });
+});
 var app = builder.Build();
+
 
 if(!app.Environment.IsDevelopment())
 {
@@ -43,6 +50,8 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
+//     pattern: "{controller=Home}/{action=Index}/{id?}")
+//     .WithStaticAssets();
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

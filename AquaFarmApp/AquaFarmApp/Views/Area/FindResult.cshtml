@@ -1,0 +1,9 @@
+﻿@model List<AquaFarmApp.Models.Area>
+<h2>Kết quả tìm kiếm</h2>
+<ul>
+    @foreach (var area in Model)
+    {
+        <li>@area.AreaName - @area.AreaStatus - @area.TypeOfWater</li>
+    }
+</ul>
+<button type="submit">Back</button>

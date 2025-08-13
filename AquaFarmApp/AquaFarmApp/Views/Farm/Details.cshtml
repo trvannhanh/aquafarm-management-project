@@ -1,0 +1,16 @@
+﻿@model AquaFarmApp.Models.Farm
+<h2>Farm detail - @Model.FarmName</h2>
+<p>Location: @Model.FarmLocation</p>
+<p>Total: @Model.AreaTotal</p>
+
+<h3>Area list:</h3>
+<ul>
+    @foreach (var area in Model.Areas)
+    {
+        <li>@area.AreaName - @area.AreaStatus - @area.TypeOfWater</li>
+        <a asp-controller="Area" asp-action="Edit" asp-route-id="@area.AreaId">Update</a>
+        <a asp-controller="Area" asp-action="Delete" asp-route-id="@area.AreaId" onclick="Are you sure ?"> Delete</a>
+
+    }
+    <a href="@Url.Action("Index", "Farm")" class="btn btn-secondary">Back</a>
+</ul>

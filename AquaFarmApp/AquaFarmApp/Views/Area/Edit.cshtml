@@ -1,0 +1,49 @@
+﻿@model AquaFarmApp.Models.Area
+@{
+    var statusList = ViewBag.StatusList as List<string>;
+    var waterList = ViewBag.TypeOfWaterList as List<string>;
+}
+
+<h2>Edit Area - @Model.AreaName</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="AreaId" />
+    <input type="hidden" asp-for="FarmId" />
+
+    <div>
+        <label>Name:</label>
+        <input asp-for="AreaName" class="form-control" />
+    </div>
+
+    <div>
+        <label>Status:</label>
+        <select asp-for="AreaStatus" class="form-control">
+            @foreach (var status in statusList)
+            {
+                <option value="@status" selected="@(Model.AreaStatus == status ? "selected" : null)">
+                    @status
+                </option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label>Size:</label>
+        <input asp-for="AreaSize" type="number" class="form-control" />
+    </div>
+
+    <div>
+        <label>Water type:</label>
+        <select asp-for="TypeOfWater" class="form-control">
+            @foreach (var type in waterList)
+            {
+                <option value="@type" selected="@(Model.TypeOfWater == type ? "selected" : null)">
+                    @type
+                </option>
+            }
+        </select>
+    </div>
+
+    <button type="submit">Save</button>
+    <a asp-controller="Farm" asp-action="Details" asp-route-id="@Model.FarmId" class="btn btn-secondary">Back</a>
+</form>

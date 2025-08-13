@@ -18,9 +18,9 @@ public partial class Area
     public string AreaName { get; set; } = null!;
 
     [Column("area_status")]
-    [StringLength(10)]
+    [StringLength(20)]
     [Unicode(false)]
-    public string AreaStatus { get; set; } = null!;
+    public string AreaStatus { get; set; } = "Avail"!;
 
     [Column("area_size")]
     public double AreaSize { get; set; }
