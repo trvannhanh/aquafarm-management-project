@@ -1,0 +1,144 @@
+﻿@model AquaFarmApp.Models.HarvestSale
+
+<html>
+<head>
+    <title>Edit Harvest Sale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f4f7;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #006994;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .top-bar {
+            background-color: #006994;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            justify-content: space-between;
+        }
+
+            .top-bar a {
+                color: white;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 1rem;
+                border-radius: 6px;
+                padding: 6px 12px;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+
+                .top-bar a:hover {
+                    background-color: #005f80;
+                    box-shadow: 0 0 8px rgba(0, 191, 255, 0.8);
+                }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #006994;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+            input:focus, textarea:focus {
+                border-color: #006994;
+                outline: none;
+                box-shadow: 0 0 5px rgba(0, 105, 148, 0.4);
+            }
+
+        .btn-save {
+            background-color: #006994;
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .btn-save:hover {
+                background-color: #005f80;
+                box-shadow: 0 0 8px rgba(0, 105, 148, 0.6);
+            }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a asp-action="Index">← Back to Sales</a>
+    </div>
+
+    <h2>Edit Harvest Sale</h2>
+
+    <form asp-action="Edit" method="post">
+        <input type="hidden" asp-for="SaleId" />
+
+        <div class="form-group">
+            <label asp-for="HarvestDate"></label>
+            <input asp-for="HarvestDate" type="datetime-local" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="BuyerName"></label>
+            <input asp-for="BuyerName" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="QuantityKg"></label>
+            <input asp-for="QuantityKg" type="number" step="0.01" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PricePerKg"></label>
+            <input asp-for="PricePerKg" type="number" step="0.01" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Revenue"></label>
+            <input asp-for="Revenue" type="number" step="0.01" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Profit"></label>
+            <input asp-for="Profit" type="number" step="0.01" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Note"></label>
+            <textarea asp-for="Note"></textarea>
+        </div>
+
+        <button type="submit" class="btn-save">💾 Save Changes</button>
+    </form>
+</body>
+</html>

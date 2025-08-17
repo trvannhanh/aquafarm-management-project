@@ -1,0 +1,126 @@
+﻿@model List<AquaFarmApp.Models.HarvestSale>
+
+<html>
+<head>
+    <title>Harvest Sales</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f4f7;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #006994;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .top-bar {
+            background-color: #006994;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            justify-content: space-between;
+        }
+
+            .top-bar a {
+                color: white;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 1rem;
+                border-radius: 6px;
+                padding: 6px 12px;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+
+                .top-bar a:hover {
+                    background-color: #005f80;
+                    box-shadow: 0 0 8px rgba(0, 191, 255, 0.8);
+                }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #006994;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e2f0f4;
+        }
+
+        .btn-create {
+            background-color: #006994;
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .btn-create:hover {
+                background-color: #005f80;
+                box-shadow: 0 0 8px rgba(0, 105, 148, 0.6);
+            }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a asp-controller="Area" asp-action="Index">← Back to Menu</a>
+        <a asp-controller="HarvestSale" asp-action="Create" class="btn-create">+ Create New Sale</a>
+    </div>
+
+    <h2>Harvest Sales</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Buyer</th>
+                <th>Quantity (kg)</th>
+                <th>Price ($/kg)</th>
+                <th>Revenue ($)</th>
+                <th>Profit ($)</th>
+                <th>Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sale in Model)
+            {
+                <tr>
+                    <td>@sale.HarvestDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@sale.BuyerName</td>
+                    <td>@sale.QuantityKg</td>
+                    <td>@sale.PricePerKg</td>
+                    <td>@sale.Revenue</td>
+                    <td>@sale.Profit</td>
+                    <td>@sale.Note</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>
