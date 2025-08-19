@@ -28,6 +28,7 @@ namespace AquaFarmApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateEnvLogViewModel model)
         {
+            var area = await _context.Areas.FindAsync(model.AreaId);
             if (ModelState.IsValid)
             {
                 var env = new EnvironmentLog
@@ -52,7 +53,7 @@ namespace AquaFarmApp.Controllers
                 }
                 _context.EnvironmentLogs.Add(env);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Area");
+                return RedirectToAction("Index", "Area", new { farmId = area.FarmId });
             }
             return View(model);
         }

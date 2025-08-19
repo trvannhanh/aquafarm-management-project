@@ -32,12 +32,12 @@ public partial class HealthCheck
     [Column("user_id")]
     public int? UserId { get; set; }
 
-    [Column("area_id")]
-    public int? AreaId { get; set; }
+    [Column("areabatch_id")]
+    public int? AreaBatchId { get; set; }
 
-    [ForeignKey("AreaId")]
+    [ForeignKey("AreaBatchId")]
     [InverseProperty("HealthChecks")]
-    public virtual Area? Area { get; set; }
+    public virtual AreaBatch? Areabatch { get; set; }
 
     [ForeignKey("UserId")]
     [InverseProperty("HealthChecks")]

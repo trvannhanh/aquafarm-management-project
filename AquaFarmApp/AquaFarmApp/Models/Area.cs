@@ -42,6 +42,5 @@ public partial class Area
     [InverseProperty("Areas")]
     public virtual Farm? Farm { get; set; }
 
-    [InverseProperty("Area")]
-    public virtual ICollection<HealthCheck> HealthChecks { get; set; } = new List<HealthCheck>();
+
 }

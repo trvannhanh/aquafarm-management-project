@@ -108,8 +108,7 @@ public partial class AquaFarmContext : IdentityDbContext<User, IdentityRole<int>
         modelBuilder.Entity<HealthCheck>(entity =>
         {
             entity.HasKey(e => e.CheckId).HasName("PK__HealthCh__C0EB87181490AB71");
-
-            entity.HasOne(d => d.Area).WithMany(p => p.HealthChecks).HasConstraintName("FK__HealthChe__area___6A30C649");
+            entity.HasOne(d => d.Areabatch).WithMany(p => p.HealthChecks).HasForeignKey(d => d.AreaBatchId).HasConstraintName("FK_HealthCheck_AreaBatch");
 
             entity.HasOne(d => d.User).WithMany(p => p.HealthChecks).HasConstraintName("FK__HealthChe__user___6B24EA82");
         });

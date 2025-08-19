@@ -1,9 +1,161 @@
 ﻿@model List<AquaFarmApp.Models.Area>
-<h2>Kết quả tìm kiếm</h2>
-<ul>
-    @foreach (var area in Model)
-    {
-        <li>@area.AreaName - @area.AreaStatus - @area.TypeOfWater</li>
-    }
-</ul>
-<button type="submit">Back</button>
+<html>
+<head>
+    <title>Area List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f4f7;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #006994;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        ul.area-list {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 20px;
+        }
+
+            ul.area-list li.area-card {
+                background-color: white;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 3px 7px rgba(0,0,0,0.1);
+                transition: box-shadow 0.3s ease, transform 0.3s ease;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+                ul.area-list li.area-card:hover {
+                    box-shadow: 0 0 15px 3px rgba(0, 105, 148, 0.7);
+                    transform: translateY(-2px);
+                }
+
+        /* Hiệu ứng cảnh báo */
+        .area-card.warning {
+            border: 2px solid red;
+            background-color: #ffe6e6;
+            animation: pulseWarning 1.5s infinite;
+        }
+
+        @@keyframes pulseWarning {
+            0% {
+                box-shadow: 0 0 8px red;
+            }
+
+            50% {
+                box-shadow: 0 0 16px red;
+            }
+
+            100% {
+                box-shadow: 0 0 8px red;
+            }
+        }
+
+        .area-info {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #004c6d;
+        }
+
+        .area-details {
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .btn-group {
+            margin-top: auto;
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            user-select: none;
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            display: inline-block;
+        }
+
+        .btn-history {
+            background-color: #006994;
+            box-shadow: 0 0 8px rgba(0, 105, 148, 0.7);
+        }
+
+            .btn-history:hover {
+                background-color: #005f80;
+                box-shadow: 0 0 16px rgba(0, 105, 148, 0.9);
+            }
+
+        .btn-create {
+            background-color: #28a745;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.7);
+        }
+
+            .btn-create:hover {
+                background-color: #218838;
+                box-shadow: 0 0 16px rgba(40, 167, 69, 0.9);
+            }
+    </style>
+</head>
+<body>
+    <h2>Kết quả tìm kiếm</h2>
+    <ul class="area-list">
+        @foreach (var area in Model)
+        {
+
+            <li class="area-card" title="@area.AreaName">
+                <div class="area-info">@area.AreaName</div>
+                <div class="area-details">
+                    Status: @area.AreaStatus <br />
+                    Water Type: @area.TypeOfWater <br />
+                </div>
+
+                <div class="btn-group">
+                    @if (User.IsInRole("Owner"))
+                    {
+                        <a asp-controller="Report" asp-action="EnvironmentReport" asp-route-areaId="@area.AreaId" class="btn btn-history" title="Thống Kê Chỉ Số Môi Trường">
+                            <i class="fas fa-history"></i> Thống kê chỉ số môi trường
+                        </a>
+                        <a asp-controller="Report" asp-action="EnvironmentReport" asp-route-areaId="@area.AreaId" class="btn btn-warning" title="Sửa">
+                            <i class="fas"></i> Sửa
+                        </a>
+                        <a asp-controller="Report" asp-action="EnvironmentReport" asp-route-areaId="@area.AreaId" class="btn btn-danger" title="Xóa">
+                            <i class="fas"></i> Xóa
+                        </a>
+                    }
+
+                    @if (User.IsInRole("Staff"))
+                    {
+                        <a asp-controller="EnvironmentLog" asp-action="Create" asp-route-id="@area.AreaId" class="btn btn-create" title="Tạo Báo Cáo Chỉ Số Môi Trường">
+                            <i class="fas fa-plus-circle"></i> Thêm báo cáo chỉ số môi trường
+                        </a>
+                    }
+
+                    <a asp-controller="Batch" asp-action="AreaBatchIndex" asp-route-id="@area.AreaId" class="btn btn-create" title="Chi tiết Khu Vực">
+                        <i class="fas fa-plus-circle"></i> Chi tiết khu vực
+                    </a>
+                </div>
+            </li>
+        }
+    </ul>
+    <button type="submit">Back</button>
+</body>
+
+

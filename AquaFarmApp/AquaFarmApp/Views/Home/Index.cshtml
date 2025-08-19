@@ -92,11 +92,15 @@
                                     <td>@farm.FarmLocation</td>
                                     <td>@farm.Areas.Count</td>
                                     <td>
-                                        <a asp-controller="Batch" asp-action="AreaBatchIndex" asp-route-farmId="@farm.FarmId" class="btn btn-info btn-sm">Xem chi tiết</a>
-                                        <a asp-controller="Farm" asp-action="Edit" asp-route-id="@farm.FarmId" class="btn btn-warning btn-sm">Sửa</a>
-                                        <form asp-controller="Farm" asp-action="Delete" asp-route-id="@farm.FarmId" method="post" style="display:inline;">
-                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa trang trại này?');">Xóa</button>
+                                        <a asp-controller="Area" asp-action="Index" asp-route-farmId="@farm.FarmId" class="btn btn-info btn-sm">Xem chi tiết</a>
+                                        @if (User.IsInRole("Owner"))
+                                        {
+                                            <a asp-controller="Farm" asp-action="Edit" asp-route-id="@farm.FarmId" class="btn btn-warning btn-sm">Sửa</a>
+                                        <form asp-controller="Farm" asp-action="Delete" asp-route-FarmId="@farm.FarmId" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn xóa trang trại này?');">
+                                            <button type="submit" class="btn btn-danger btn-sm">Xóa</button>
                                         </form>
+                                        }
+                                        
                                     </td>
                                 </tr>
                             }

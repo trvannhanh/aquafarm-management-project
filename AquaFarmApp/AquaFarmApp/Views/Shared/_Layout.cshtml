@@ -6,13 +6,67 @@
     <title>@ViewData["Title"] - AquaFarmApp</title>
     <script type="importmap"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/AquaFarmApp.styles.css" asp-append-version="true" />
+    <style>
+        .navbar {
+            background-color: #1e3a8a; /* Deep blue for water theme */
+        }
+
+        .navbar-brand, .nav-link {
+            color: #ffffff !important; /* White text for contrast */
+        }
+
+            .nav-link:hover {
+                color: #93c5fd !important; /* Light blue on hover */
+            }
+
+        .dropdown-menu {
+            background-color: #1e3a8a;
+            border: none;
+        }
+
+        .dropdown-item {
+            color: #ffffff;
+        }
+
+            .dropdown-item:hover {
+                background-color: #2563eb;
+                color: #ffffff;
+            }
+
+        body {
+            background-color: #e0f2fe; /* Light blue background for aqua theme */
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .footer {
+            background-color: #1e3a8a;
+            color: #ffffff;
+            padding: 15px 0;
+        }
+
+            .footer a {
+                color: #93c5fd;
+                text-decoration: none;
+            }
+
+                .footer a:hover {
+                    color: #ffffff;
+                }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">AquaFarmApp</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -21,28 +75,37 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Admin">Admin</a>
+                                <a class="nav-link" asp-controller="Home" asp-action="Admin">Admin Dashboard</a>
                             </li>
                         }
                         @if (User.IsInRole("Owner"))
                         {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Báo cáo thống kê
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Report" asp-action="EnvironmentReport">Báo cáo thống kê môi trường</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Report" asp-action="RevenueReport">Báo cáo thống kê doanh thu</a></li>
+                                </ul>
+                            </li>
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Owner">Owner</a>
+                                <a class="nav-link" asp-controller="HarvestSale" asp-action="Index">Quản lý tiêu thụ</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="HarvestSale" asp-action="Index">Ghi nhận cho ăn</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="FeedSchedule" asp-action="Index">Báo cáo cho ăn</a>
                             </li>
                         }
                         @if (User.IsInRole("Staff"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Staff">Staff</a>
+                                <a class="nav-link" asp-controller="Home" asp-action="Staff">Lịch Cho Ăn</a>
                             </li>
                         }
                         <partial name="_LoginPartial" />
@@ -58,15 +121,13 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
+        <div class="container text-center">
             &copy; 2025 - AquaFarmApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
-

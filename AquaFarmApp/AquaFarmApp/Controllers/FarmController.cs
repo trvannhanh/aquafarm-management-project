@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using AquaFarmApp.Data;
+﻿using AquaFarmApp.Data;
 using AquaFarmApp.Models;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using AquaFarmApp.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace AquaFarmApp.Controllers
 {
@@ -59,7 +60,7 @@ namespace AquaFarmApp.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -85,36 +86,67 @@ namespace AquaFarmApp.Controllers
             return View(farm);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Farm updatedFarm)
         {
             if (id != updatedFarm.FarmId) return NotFound();
-
             if (!ModelState.IsValid) return View(updatedFarm);
 
             var existingFarm = await _context.Farms.FindAsync(id);
             if (existingFarm == null) return NotFound();
 
-            existingFarm.FarmName = updatedFarm.FarmName;
-            existingFarm.FarmLocation = updatedFarm.FarmLocation;
+            try
+            {
+                existingFarm.FarmName = updatedFarm.FarmName;
+                existingFarm.FarmLocation = updatedFarm.FarmLocation;
+                existingFarm.AreaTotal = updatedFarm.AreaTotal; // Cập nhật AreaTotal nếu cần
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Cập nhật trang trại thành công.";
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi cập nhật trang trại.";
+                return View(updatedFarm);
+            }
 
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int FarmId)
         {
-            var farm = await _context.Farms.Include(f => f.Areas).FirstOrDefaultAsync(f => f.FarmId == id);
+            var farm = await _context.Farms
+                .Include(f => f.Areas)
+                .Include(f => f.Users)
+                .FirstOrDefaultAsync(f => f.FarmId == FarmId);
 
-            if (farm != null)
+            if (farm == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy trang trại.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (farm.Users.Any())
+            {
+                TempData["ErrorMessage"] = "Không thể xóa trang trại do có nhân viên liên kết.";
+                return RedirectToAction("Index", "Home");
+            }
+
+            try
             {
                 _context.Areas.RemoveRange(farm.Areas);
                 _context.Farms.Remove(farm);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Xóa trang trại thành công.";
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi xóa trang trại.";
             }
 
-            return RedirectToAction("Index", "Farm");
+            return RedirectToAction("Index", "Home");
         }
     }
 } 

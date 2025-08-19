@@ -119,8 +119,36 @@
     </style>
 </head>
 <body>
-    <h2>Area List</h2>
+    <h2>Tìm Area</h2>
+    <form asp-action="Find" method="post">
+        <label>Trạng thái:</label>
+        <select name="areaStatus">
+            <option value="">--All--</option>
+            @foreach (var s in (List<string>)ViewBag.AreaStatusList)
+            {
+                <option value="@s">@s</option>
+            }
+        </select>
 
+        <label>Loại nước:</label>
+        <select name="typeOfWater">
+            <option value="">--All--</option>
+            @foreach (var t in (List<string>)ViewBag.TypeOfWaterList)
+            {
+                <option value="@t">@t</option>
+            }
+        </select>
+
+        <button type="submit">Tìm</button>
+    </form>
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Danh sách khu vực</h2>
+        @if (User.IsInRole("Owner"))
+        {
+            <a asp-controller="Batch" asp-action="CreateBatch" class="btn btn-primary">Thêm Lứa nuôi mới</a>
+        }
+    </div>
     <ul class="area-list">
         @foreach (var area in Model)
         {
@@ -131,15 +159,31 @@
                 <div class="area-details">
                     Status: @area.AreaStatus <br />
                     Water Type: @area.TypeOfWater <br />
-                    EnvCheck: @(area.EnvCheck != null ? area.EnvCheck.ToString() : "Not Check")
                 </div>
 
                 <div class="btn-group">
-                    <a asp-controller="Area" asp-action="EnvHis" asp-route-id="@area.AreaId" class="btn btn-history" title="View EnvCheck History">
-                        <i class="fas fa-history"></i> EnvCheck History
-                    </a>
-                    <a asp-controller="EnvironmentLog" asp-action="Create" asp-route-id="@area.AreaId" class="btn btn-create" title="Create EnvCheck">
-                        <i class="fas fa-plus-circle"></i> Create EnvCheck
+                    @if (User.IsInRole("Owner"))
+                    {
+                        <a asp-controller="Report" asp-action="EnvironmentReport" asp-route-areaId="@area.AreaId" class="btn btn-history" title="Thống Kê Chỉ Số Môi Trường">
+                            <i class="fas fa-history"></i> Thống kê chỉ số môi trường
+                        </a>
+                        <a asp-controller="Area" asp-action="Edit" asp-route-id="@area.AreaId" class="btn btn-warning" title="Sửa">
+                            <i class="fas"></i> Sửa
+                        </a>
+                        <a asp-controller="Area" asp-action="Delete" asp-route-id="@area.AreaId" class="btn btn-danger" title="Xóa">
+                            <i class="fas"></i> Xóa
+                        </a>
+                    }
+
+                    @if (User.IsInRole("Staff"))
+                    {
+                        <a asp-controller="EnvironmentLog" asp-action="Create" asp-route-id="@area.AreaId" class="btn btn-create" title="Tạo Báo Cáo Chỉ Số Môi Trường">
+                            <i class="fas fa-plus-circle"></i> Thêm báo cáo chỉ số môi trường
+                        </a>
+                    }
+
+                    <a asp-controller="Batch" asp-action="AreaBatchIndex" asp-route-id="@area.AreaId" class="btn btn-create" title="Chi tiết Khu Vực">
+                        <i class="fas fa-plus-circle"></i> Chi tiết khu vực
                     </a>
                 </div>
             </li>

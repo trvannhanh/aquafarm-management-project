@@ -1,0 +1,166 @@
+﻿@model List<AquaFarmApp.Models.FeedSchedule>
+
+<html>
+<head>
+    <title>Feed Schedule</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e6f4f7;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #006994;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .top-bar {
+            background-color: #006994;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-radius: 8px;
+            justify-content: space-between;
+        }
+
+            .top-bar a {
+                color: white;
+                text-decoration: none;
+                font-weight: bold;
+                font-size: 1rem;
+                border-radius: 6px;
+                padding: 6px 12px;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+
+                .top-bar a:hover {
+                    background-color: #005f80;
+                    box-shadow: 0 0 8px rgba(0, 191, 255, 0.8);
+                }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #006994;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        tr:hover {
+            background-color: #e2f0f4;
+        }
+
+        .btn-create, .btn-action {
+            background-color: #006994;
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .btn-create:hover, .btn-action:hover {
+                background-color: #005f80;
+                box-shadow: 0 0 8px rgba(0, 105, 148, 0.6);
+            }
+
+        .status-overdue {
+            color: red;
+            font-weight: bold;
+        }
+
+        .status-done {
+            color: green;
+            font-weight: bold;
+        }
+
+        .status-notdone {
+            color: orange;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <a asp-controller="Area" asp-action="Index">← Back to Menu</a>
+        <a asp-action="Create" class="btn-create">+ Add Feed Schedule</a>
+    </div>
+
+    <h2>Feed Schedules</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Feed Type</th>
+                <th>Cost ($)</th>
+                <th>Quantity (kg)</th>
+                <th>Time</th>
+                <th>Status</th>
+                <th>Note</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var feed in Model)
+            {
+                var displayStatus = feed.FeedStatus;
+                var statusClass = "status-notdone";
+
+                if (feed.FeedStatus == "Not Done" && feed.FeedTime < DateTime.Now)
+                {
+                    displayStatus = "OverDue";
+                    statusClass = "status-overdue";
+                }
+                else if (feed.FeedStatus == "Done")
+                {
+                    statusClass = "status-done";
+                }
+
+                <tr>
+                    <td>@feed.FeedType</td>
+                    <td>@feed.FeedCost</td>
+                    <td>@feed.FeedQuantity</td>
+                    <td>@feed.FeedTime?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="@statusClass">@displayStatus</td>
+                    <td>@feed.Note</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@feed.FeedId" class="btn-action">Edit</a>
+                        <a asp-action="Details" asp-route-id="@feed.FeedId" class="btn-action">Details</a>
+                        <a asp-action="Delete" asp-route-id="@feed.FeedId" class="btn-action">Delete</a>
+
+                        @* Chỉ hiện nút "Đã cho ăn" nếu chưa Done *@
+                        @if (feed.FeedStatus != "Done")
+                        {
+                            <form asp-action="MarkAsDone" asp-route-id="@feed.FeedId" method="post" style="display:inline;">
+                                <button type="submit" class="btn-action">Đã cho ăn</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

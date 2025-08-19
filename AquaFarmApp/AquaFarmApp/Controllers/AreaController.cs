@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using AquaFarmApp.Data;
+﻿using AquaFarmApp.Data;
 using AquaFarmApp.Models;
+using AquaFarmApp.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AquaFarmApp.Controllers
@@ -18,13 +19,6 @@ namespace AquaFarmApp.Controllers
 
         private List<string> GetStatus() => new() { "Avail", "Not Avail", "Health Secured" };
         private List<string> GetWaterType() => new() { "Freshwater", "Brackish water", "Saltwater", "Recirculated water", "Treated water" };
-
-        public IActionResult Find()
-        {
-            ViewBag.AreaStatusList = GetStatus();
-            ViewBag.TypeOfWaterList = GetWaterType();  
-            return View();
-        }
 
         [HttpPost]
         public async Task<IActionResult> Find(string areaStatus, string typeOfWater)
@@ -65,7 +59,7 @@ namespace AquaFarmApp.Controllers
             area.AreaSize = updatedArea.AreaSize;
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("Details", "Farm", new { id = area.FarmId });
+            return RedirectToAction("Index", "Area", new { farmId = area.FarmId });
         }
 
         [HttpGet]
@@ -81,7 +75,23 @@ namespace AquaFarmApp.Controllers
             _context.Areas.Remove(area);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Farm", new { id = area.FarmId });
+            return RedirectToAction("Index", "Area", new { farmId = area.FarmId });
+        }
+
+        public async Task<IActionResult> Index(int farmId)
+        {
+            ViewBag.AreaStatusList = GetStatus();
+            ViewBag.TypeOfWaterList = GetWaterType();
+
+            var areas = await _context.Areas.Where(a => farmId.Equals(a.FarmId)).Select(a => new AreaIndexViewModel
+            {
+                AreaId = a.AreaId,
+                AreaName = a.AreaName,
+                AreaStatus = a.AreaStatus,
+                TypeOfWater = a.TypeOfWater,
+                EnvWarn = a.EnvironmentLogs.OrderByDescending(e => e.RecordedAt).Select(e => e.IsWarning).FirstOrDefault()
+            }).ToListAsync();
+            return View(areas);
         }
 
 

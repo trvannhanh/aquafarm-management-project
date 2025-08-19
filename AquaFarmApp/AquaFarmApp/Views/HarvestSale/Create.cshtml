@@ -1,16 +1,13 @@
-﻿@model AquaFarmApp.ViewModels.CreateEnvLogViewModel
-
-<!DOCTYPE html>
+﻿@model AquaFarmApp.ViewModels.CreateSaleViewModel
 <html>
 <head>
-    <meta charset="utf-8" />
-    <title>Create Environment Log</title>
+    <title>Create Harvest Sale</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #e6f4f7;
             margin: 20px;
-            padding-bottom: 80px; /* Add padding for potential fixed footer */
+            padding-bottom: 80px; /* Add padding to account for potential fixed footer */
             min-height: 100vh; /* Ensure body takes full viewport height */
             display: flex;
             flex-direction: column;
@@ -29,7 +26,7 @@
             padding: 20px 25px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            margin-bottom: 20px; /* Ensure form doesn't touch footer */
+            margin-bottom: 20px; /* Add margin to ensure form doesn't touch footer */
         }
 
         label {
@@ -111,7 +108,11 @@
                     font-size: 1.2rem;
                 }
 
-        /* Footer styling for fixed footer */
+        .row {
+            --bs-gutter-x: 0.2rem;
+        }
+
+        /* Ensure footer doesn't overlap content */
         footer {
             position: fixed;
             bottom: 0;
@@ -129,40 +130,70 @@
             <i class="fas fa-arrow-left"></i> Back to Menu
         </a>
     </div>
-    <h2>Create Environment Log</h2>
-
-    <form method="post" id="envForm">
+    <h2>Create Harvest Sale</h2>
+    <form method="post" id="saleForm">
         @Html.AntiForgeryToken()
-        <input asp-for="AreaId" type="hidden" />
+        <input asp-for="AreaBatchId" type="hidden" />
 
-        <label>Date & Time:</label>
-        <input asp-for="RecordedAt" type="datetime-local" class="form-control" />
-        <span asp-validation-for="RecordedAt" class="text-danger"></span>
+        <div class="mb-3">
+            <label class="form-label">Date & Time</label>
+            <input asp-for="harvestdate" type="datetime-local" class="form-control" />
+            <span asp-validation-for="harvestdate" class="text-danger"></span>
+        </div>
 
-        <label>Temperature (°C):</label>
-        <input asp-for="Temperature" class="form-control" />
-        <span asp-validation-for="Temperature" class="text-danger"></span>
+        <div class="mb-3">
+            <label class="form-label">Buyer</label>
+            <input asp-for="buyername" class="form-control" placeholder="Enter buyer name" />
+            <span asp-validation-for="buyername" class="text-danger"></span>
+        </div>
 
-        <label>pH Level:</label>
-        <input asp-for="PhLevel" class="form-control" />
-        <span asp-validation-for="PhLevel" class="text-danger"></span>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Price($/kg)</label>
+                <input asp-for="priceperkg" class="form-control" id="price" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Estimated Cost($)</label>
+                <input asp-for="estimatedcost" class="form-control" id="cost" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Quantity(units)</label>
+                <input type="number" class="form-control" id="quantity" />
+            </div>
+        </div>
 
-        <label>Oxygen Level (mg/L):</label>
-        <input asp-for="OxygenLevel" class="form-control" />
-        <span asp-validation-for="OxygenLevel" class="text-danger"></span>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Weight per Unit(kg)</label>
+                <input type="number" step="0.01" class="form-control" id="weightPerUnit" />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Total Weight(kg)</label>
+                <input asp-for="quantitykg" class="form-control" id="totalWeight" readonly />
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Revenue($)</label>
+                <input asp-for="revenue" class="form-control" id="revenue" readonly />
+            </div>
+        </div>
 
-        <label>Salinity (‰):</label>
-        <input asp-for="Salinity" class="form-control" />
-        <span asp-validation-for="Salinity" class="text-danger"></span>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Profit($)</label>
+                <input asp-for="profit" class="form-control" id="profit" readonly />
+            </div>
+            <div class="col-md-6 mb-3">
+                <label class="form-label">Note</label>
+                <textarea asp-for="note" class="form-control" rows="3"></textarea>
+            </div>
+        </div>
 
-        <label>Note:</label>
-        <input asp-for="Note" class="form-control" />
-        <span asp-validation-for="Note" class="text-danger"></span>
-
-        <button type="submit" class="btn-submit">Create Log</button>
+        <div class="d-flex justify-content-between mt-3">
+            <button type="submit" class="btn-submit">Create Sale</button>
+        </div>
     </form>
 
-    <!-- Example footer (if present in layout) -->
+    <!-- Example footer (if present in your layout) -->
     <footer>
         <p>&copy; 2025 AquaFarmApp. All rights reserved.</p>
     </footer>
@@ -171,9 +202,26 @@
 
 @section Scripts {
     <script>
+        function calculateAll() {
+            let price = parseFloat(document.getElementById("price").value) || 0;
+            let cost = parseFloat(document.getElementById("cost").value) || 0;
+            let quantity = parseFloat(document.getElementById("quantity").value) || 0;
+            let weightPerUnit = parseFloat(document.getElementById("weightPerUnit").value) || 0;
+            let totalWeight = quantity * weightPerUnit;
+            document.getElementById("totalWeight").value = totalWeight.toFixed(2);
+            let revenue = price * totalWeight;
+            let profit = revenue - cost;
+            document.getElementById("revenue").value = revenue.toFixed(2);
+            document.getElementById("profit").value = profit.toFixed(2);
+        }
+
+        ["price", "cost", "quantity", "weightPerUnit"].forEach(id => {
+            document.getElementById(id).addEventListener("input", calculateAll);
+        });
+
         // Ensure the submit button is visible when scrolling
         window.addEventListener('scroll', function () {
-            const form = document.getElementById('envForm');
+            const form = document.getElementById('saleForm');
             const submitButton = form.querySelector('.btn-submit');
             const footer = document.querySelector('footer');
             if (footer) {

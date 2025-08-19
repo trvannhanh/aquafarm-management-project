@@ -26,12 +26,7 @@ builder.Services.AddIdentity<User, IdentityRole<int>>( options =>
 })
     .AddEntityFrameworkStores<AquaFarmContext>()
     .AddDefaultTokenProviders();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AquaFarm API", Version = "v1" });
-});
+ 
 var app = builder.Build();
 
 

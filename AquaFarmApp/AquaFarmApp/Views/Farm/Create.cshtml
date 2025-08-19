@@ -1,79 +1,144 @@
 ﻿@model AquaFarmApp.ViewModels.CreateFarmViewModel
 @{
-    ViewData["Title"] = "Create Farm";
+    ViewData["Title"] = "Tạo Trang Trại";
     var statusList = (List<string>)ViewBag.StatusList;
     var waterList = (List<string>)ViewBag.WaterList;
 }
 
-<h2>Create Farm</h2>
+<div class="container py-4 mb-5">
+    <h2 class="mb-4">Tạo Trang Trại</h2>
 
-<form method="post" id="farmForm">
-    <div>
-        <label>Farm Name:</label>
-        <input asp-for="FarmName" class="form-control" />
-        <span asp-validation-for="FarmName" class="text-danger"></span>
-    </div>
-    <div>
-        <label>Location:</label>
-        <input asp-for="FarmLocation" class="form-control" />
-        <span asp-validation-for="FarmLocation" class="text-danger"></span>
-    </div>
-    <div>
-        <label>Number of Areas:</label>
-        <input asp-for="AreaTotal" id="areaTotal" class="form-control" type="number" min="1" />
-        <span asp-validation-for="AreaTotal" class="text-danger"></span>
-    </div>
-    <button type="button" onclick="generateAreas()">Next</button>
+    <form method="post" id="farmForm" class="needs-validation" novalidate>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label" for="FarmName">Tên Trang Trại:</label>
+                <input asp-for="FarmName" class="form-control" required />
+                <span asp-validation-for="FarmName" class="text-danger"></span>
+            </div>
+        </div>
 
-    <div id="areasSection" style="margin-top:20px; display:none;"></div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label" for="FarmLocation">Vị Trí:</label>
+                <input asp-for="FarmLocation" class="form-control" required />
+                <span asp-validation-for="FarmLocation" class="text-danger"></span>
+            </div>
+        </div>
 
-    <button type="submit" style="display:none;" id="submitBtn">Create Farm & Areas</button>
-</form>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label class="form-label" for="areaTotal">Số Lượng Khu Vực:</label>
+                <input asp-for="AreaTotal" id="areaTotal" class="form-control" type="number" min="1" required />
+                <span asp-validation-for="AreaTotal" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <button type="button" id="generateBtn" onclick="generateAreas()" class="btn btn-primary">Tiếp Theo</button>
+            </div>
+        </div>
+
+        <div id="areasSection" class="mt-4" style="display:none;">
+            <h4>Cấu Hình Khu Vực</h4>
+            <div id="areasContainer"></div>
+        </div>
+
+        <div class="row mt-4 mb-5">
+            <div class="col-md-6">
+                <button type="submit" style="display:none;" id="submitBtn" class="btn btn-success">Tạo Trang Trại & Khu Vực</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
         function generateAreas() {
+            const generateBtn = document.getElementById("generateBtn");
             const total = parseInt(document.getElementById("areaTotal").value);
+
+            // Validate input
             if (isNaN(total) || total < 1) {
-                alert("Please enter valid number of areas.");
+                alert("Vui lòng nhập số lượng khu vực hợp lệ (tối thiểu 1).");
                 return;
             }
 
-            const section = document.getElementById("areasSection");
-            section.innerHTML = ""; // Clear
+            // Disable button and show loading state
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = 'Đang tạo... <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+
+            const section = document.getElementById("areasContainer");
+            section.innerHTML = ""; // Clear previous content
 
             const statuses = @Html.Raw(Json.Serialize(statusList));
             const waters = @Html.Raw(Json.Serialize(waterList));
 
-            for (let i = 0; i < total; i++) {
-                const div = document.createElement("div");
-                div.innerHTML = `
-                    <fieldset style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
-                        <legend>Area ${i + 1}</legend>
+            try {
+                for (let i = 0; i < total; i++) {
+                    const div = document.createElement("div");
+                    div.className = "card mb-3";
+                    div.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">Khu Vực ${i + 1}</h5>
+                            <div class="mb-3">
+                                <label class="form-label">Tên Khu Vực:</label>
+                                <input name="Areas[${i}].AreaName" class="form-control" required />
+                                <div class="invalid-feedback">Vui lòng cung cấp tên khu vực.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Trạng Thái:</label>
+                                <select name="Areas[${i}].AreaStatus" class="form-select" required>
+                                    <option value="">Chọn trạng thái</option>
+                                    ${statuses.map(s => `<option value="${s}">${s}</option>`).join("")}
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn trạng thái.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Kích Thước:</label>
+                                <input type="number" name="Areas[${i}].AreaSize" class="form-control" min="0" required />
+                                <div class="invalid-feedback">Vui lòng cung cấp kích thước hợp lệ.</div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Loại Nước:</label>
+                                <select name="Areas[${i}].TypeOfWater" class="form-select" required>
+                                    <option value="">Chọn loại nước</option>
+                                    ${waters.map(w => `<option value="${w}">${w}</option>`).join("")}
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn loại nước.</div>
+                            </div>
+                        </div>
+                    `;
+                    section.appendChild(div);
+                }
 
-                        <label>Area Name:</label>
-                        <input name="Areas[${i}].AreaName" class="form-control" required />
-
-                        <label>Status:</label>
-                        <select name="Areas[${i}].AreaStatus" class="form-control">
-                            ${statuses.map(s => `<option value="${s}">${s}</option>`).join("")}
-                        </select>
-
-                        <label>Size:</label>
-                        <input type="number" name="Areas[${i}].AreaSize" class="form-control" required />
-
-                        <label>Type of Water:</label>
-                        <select name="Areas[${i}].TypeOfWater" class="form-control">
-                            ${waters.map(w => `<option value="${w}">${w}</option>`).join("")}
-                        </select>
-                    </fieldset>
-                `;
-                section.appendChild(div);
+                // Show areas section and submit button
+                document.getElementById("areasSection").style.display = "block";
+                document.getElementById("submitBtn").style.display = "inline-block";
+            } catch (error) {
+                alert("Đã xảy ra lỗi khi tạo khu vực. Vui lòng thử lại.");
+                console.error(error);
+            } finally {
+                // Restore button state
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = "Tiếp Theo";
             }
-
-            section.style.display = "block";
-            document.getElementById("submitBtn").style.display = "inline-block";
         }
+
+        // Bootstrap form validation
+        (function () {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
     </script>
 }

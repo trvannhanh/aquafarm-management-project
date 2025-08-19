@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace AquaFarmApp.Controllers
 {
-    [Authorize(Roles = "Admin, Owner")]
     public class BatchController : Controller
     {
         private readonly AquaFarmContext _context;
@@ -23,24 +23,27 @@ namespace AquaFarmApp.Controllers
 
         // Danh sách AreaBatch
         [HttpGet]
-        public async Task<IActionResult> AreaBatchIndex(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> AreaBatchIndex(int id)
         {
-            var areaBatches = from ab in _context.AreaBatches
-                              join a in _context.Areas on ab.AreaId equals a.AreaId
-                              join b in _context.Batches on ab.BatchId equals b.BatchId
-                              select new AreaBatchViewModel
-                              {
-                                  AreaBatchId = ab.Id,
-                                  AreaId = ab.AreaId,
-                                  AreaName = a.AreaName,
-                                  BatchId = ab.BatchId,
-                                  Quantity = ab.Quantity,
-                                  AquaticBreed = b.AquaticBreed,
-                                  BatchStatus = b.BatchStatus
-                              };
 
-            var paginatedList = PaginatedList<AreaBatchViewModel>.Create(areaBatches, page, pageSize);
-            return View("AreaBatchIndex", paginatedList);
+            var query = _context.AreaBatches
+                .Where(ab => id.Equals(ab.AreaId))
+                .Join(_context.Batches,
+                    areaBatch => areaBatch.BatchId,
+                    batch => batch.BatchId,
+                    (areaBatch, batch) => new AreaBatchViewModel
+                    {
+                        AreaBatchId = areaBatch.Id,
+                        AreaId = areaBatch.AreaId,
+                        BatchId = areaBatch.BatchId,
+                        Quantity = areaBatch.Quantity,
+                        AquaticBreed = batch.AquaticBreed,
+                        BatchStatus = batch.BatchStatus
+                    });
+
+            var results = query.ToList();
+
+            return View(results);
         }
 
         // Danh sách Batch
@@ -360,7 +363,7 @@ namespace AquaFarmApp.Controllers
                         await _context.SaveChangesAsync();
                         await transaction.CommitAsync();
                         TempData["Success"] = "Phân bổ batch thành công.";
-                        return RedirectToAction("Index");
+                        return RedirectToAction("BatchIndex", "Batch");
                     }
                     catch (Exception ex)
                     {

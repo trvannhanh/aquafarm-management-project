@@ -38,4 +38,7 @@ public partial class AreaBatch
 
     [InverseProperty("Areabatch")]
     public virtual ICollection<LiveStockTran> LiveStockTrans { get; set; } = new List<LiveStockTran>();
+
+    [InverseProperty("Areabatch")]
+    public virtual ICollection<HealthCheck> HealthChecks { get; set; } = new List<HealthCheck>();
 }

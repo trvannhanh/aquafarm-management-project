@@ -1,87 +1,136 @@
-﻿@using AquaFarmApp.Models
-@using AquaFarmApp.ViewModels
-@model PaginatedList<AreaBatchViewModel>
+﻿@using AquaFarmApp.ViewModels
+@model List<AreaBatchViewModel>
 
-<h2>Danh sách phân bổ khu vực</h2>
-
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@Html.Encode(TempData["Success"])</div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@Html.Encode(TempData["Error"])</div>
+@{
+    ViewData["Title"] = "Thông Tin Chi Tiết Khu Vực";
+    int areaId = ViewBag.AreaId ?? Model.FirstOrDefault()?.AreaId ?? 0;
+    int areaBatchId = ViewBag.AreaBatchId ?? Model.FirstOrDefault()?.AreaBatchId ?? 0;
+    string areaName = ViewBag.AreaName ?? Model.FirstOrDefault()?.AreaName ?? $"Khu vực ID: {areaId}";
 }
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Area Name</th>
-            <th>Batch ID</th>
-            <th>Quantity</th>
-            <th>Aquatic Breed</th>
-            <th>Batch Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            @foreach (var areaBatch in Model)
-            {
-                <tr>
-                    <td>@areaBatch.AreaName</td>
-                    <td>@areaBatch.BatchId</td>
-                    <td>@areaBatch.Quantity</td>
-                    <td>@areaBatch.AquaticBreed</td>
-                    <td>@areaBatch.BatchStatus</td>
-                    <td>
-                        <a asp-controller="LiveStockTran" asp-action="CreateTrans" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-info btn-sm" >Create Transaction</a>
-                        <a asp-controller="LiveStockTran" asp-action="LiveStockTransIndex" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-info btn-sm">Details</a>
-                        <a asp-action="DeleteAreaBatch" asp-route-id="@areaBatch.AreaBatchId" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa phân bổ này?')">Delete</a>
-                    </td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="6">Không có bản ghi phân bổ nào.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="container-fluid mt-4">
 
-@if (Model != null)
-{
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            @if (Model.HasPreviousPage)
-            {
-                <li class="page-item">
-                    <a class="page-link" asp-action="AreaBatchIndex" asp-route-page="@(Model.PageIndex - 1)" asp-route-pageSize="@Model.PageSize">Previous</a>
-                </li>
-            }
-            @for (var i = 1; i <= Model.TotalPages; i++)
-            {
-                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                    <a class="page-link" asp-action="AreaBatchIndex" asp-route-page="@i" asp-route-pageSize="@Model.PageSize">@i</a>
-                </li>
-            }
-            @if (Model.HasNextPage)
-            {
-                <li class="page-item">
-                    <a class="page-link" asp-action="AreaBatchIndex" asp-route-page="@(Model.PageIndex + 1)" asp-route-pageSize="@Model.PageSize">Next</a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0 text-primary">Thông Tin Chi Tiết @areaName</h1>
+            <div>
+                
+            </div>
+        </div>
+        <!-- Thống kê nhanh (tùy chọn) -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card border-left-primary shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Tổng số lứa nuôi</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Count</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-boxes fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-left-success shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Tổng số lượng</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Sum(ab => ab.Quantity)</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-fish fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Danh sách AreaBatch -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Danh Sách Lô Hàng Trong Khu Vực</h6>
+            </div>
+            <div class="card-body">
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover" id="areaBatchTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Mã Lứa Nuôi</th>
+                                    <th>Giống Thủy Sản</th>
+                                    <th>Số Lượng</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.BatchId</td>
+                                        <td>@item.AquaticBreed</td>
+                                        <td>@item.Quantity.ToString("N0")</td>
+                                        <td>
+                                            <span class="badge @(item.BatchStatus == "Avail" ? "badge-success" : item.BatchStatus == "NotAvail" ? "badge-danger" : "badge-warning")">
+                                                @(item.BatchStatus == "Avail" ? "Đang hoạt động" : item.BatchStatus == "NotAvail" ? "Ngừng hoạt động" : item.BatchStatus)
+                                            </span>
+                                        </td>
+                                    @if(item.BatchStatus == "Avail")
+                                    {
+                                        <td>
+                                            @if (User.IsInRole("Owner"))
+                                            {
+
+                                                <a asp-controller="FeedSchedule" asp-action="Create" asp-route-id="@areaBatchId" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-fish"></i> Tạo Lịch Cho Ăn
+                                                </a>
+                                                <a asp-controller="HarvestSale" asp-action="Create" asp-route-id="@areaBatchId" class="btn btn-info btn-sm">
+                                                    <i class="fas fa-fish"></i> Tạo Báo Cáo Tiêu Thụ
+                                                </a>
+                                            }
+                                            @if (User.IsInRole("Staff"))
+                                            {
+
+                                                <a asp-controller="LiveStockTran" asp-action="CreateTrans" asp-route-id="@areaBatchId" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-plus"></i> Tạo Giao Dịch Nhập Xuất
+                                                </a>
+                                                <a asp-controller="HealthCheck" asp-action="Create" asp-route-areaId="@areaBatchId" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-heartbeat"></i> Tạo Báo Cáo Sức Khỏe
+                                                </a>
+                                            }
+
+                                            
+                                            
+                                        </td>
+                                    }
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">Hiện tại chưa có lô hàng nào trong khu vực này.</p>
+                }
+            </div>
+        </div>
+    </div>
 
 @section Scripts {
-    <script>
-        function confirmDelete() {
-            return confirm('Bạn có chắc muốn xóa phân bổ này?');
-        }
-    </script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            // Xác nhận hành động xóa (nếu cần thêm hành động xóa)
+            function confirmAction(actionName) {
+                return confirm(`Bạn có chắc muốn ${actionName}?`);
+            }
+        </script>
 }
