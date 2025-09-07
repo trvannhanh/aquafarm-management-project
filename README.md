@@ -1,7 +1,7 @@
 <h1 align="center">
   <br>
   <a href="https://github.com/trvannhanh/AquaFarm-Management">
-    <img src="https://img.icons8.com/external-flat-juicy-fish/60/000000/external-fish-aquatic-animals-flat-flat-juicy-fish.png" alt="AquaFarm" width="100">
+    <img src="https://res.cloudinary.com/dqpkxxzaf/image/upload/v1757238114/pixel-art-fish_nyav1v.png" alt="AquaFarm" width="100">
   </a>
   <br>
   AquaFarm Management
